@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aquaris x S.I.T | Расширенный дэшборд сенсоров</title>
+
+  <!-- Шрифт и AOS-анимации -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --white: #ffffff;
+      --teal: #30AC97;
+      --mint: #72CAB7;
+      --dark: #17827E;
+      --light-mint: #E8F6F3;
+      --gradient: linear-gradient(135deg, #30AC97, #17827E);
+      --gradient-light: linear-gradient(135deg, #72CAB7, #30AC97);
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --radius: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--white);
+      color: #111;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      line-height: 1.6;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--dark);
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo i {
+      font-size: 1.8rem;
+      color: var(--teal);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header button {
+      background: var(--gradient);
+      color: var(--white);
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+
+    header button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem;
+      background: radial-gradient(circle at top left, #72CAB7, #30AC97 60%, #17827E);
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.1"><polygon fill="white" points="0,1000 1000,0 1000,1000"/></svg>');
+      background-size: cover;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .hero p {
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+      font-size: 1.2rem;
+      opacity: 0.95;
+    }
+
+    /* ===== Общие стили секций ===== */
+    section {
+      padding: 4rem 2rem;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      color: var(--dark);
+      margin-bottom: 3rem;
+      position: relative;
+      font-weight: 700;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 100px;
+      height: 5px;
+      background: var(--gradient);
+      margin: 0.8rem auto;
+      border-radius: 5px;
+    }
+
+    /* ===== ВЫБОР ДАТЧИКА ===== */
+    .sensor-selector {
+      background: var(--light-mint);
+    }
+
+    .selector-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .selector-title {
+      font-size: 1.5rem;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .sensor-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .sensor-option {
+      background: var(--light-mint);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .sensor-option:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+    }
+
+    .sensor-option.active {
+      border-color: var(--teal);
+      background: var(--gradient-light);
+      color: white;
+    }
+
+    .sensor-option.active i {
+      color: white;
+    }
+
+    .sensor-option i {
+      font-size: 2rem;
+      color: var(--teal);
+    }
+
+    .sensor-option span {
+      font-weight: 500;
+    }
+
+    /* ===== ДЭШБОРД ===== */
+    .dashboard {
+      background: var(--white);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .sensor-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      border-left: 4px solid var(--teal);
+    }
+
+    .sensor-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    }
+
+    .sensor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .sensor-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-light);
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .sensor-status {
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-normal {
+      background: rgba(46, 204, 113, 0.2);
+      color: #27ae60;
+    }
+
+    .status-warning {
+      background: rgba(241, 196, 15, 0.2);
+      color: #f39c12;
+    }
+
+    .status-danger {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
+    .sensor-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .sensor-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+      color: var(--dark);
+    }
+
+    .sensor-unit {
+      font-size: 1rem;
+      color: #666;
+      margin-left: 0.3rem;
+    }
+
+    .sensor-details {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .sensor-trend {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .trend-up {
+      color: #e74c3c;
+    }
+
+    .trend-down {
+      color: #27ae60;
+    }
+
+    .trend-stable {
+      color: #3498db;
+    }
+
+    .sensor-average {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .sensor-history {
+      height: 60px;
+      margin-top: 1rem;
+      border-radius: 8px;
+      background: var(--light-mint);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .history-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      stroke: var(--teal);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* ===== ГРАФИКИ ===== */
+    .charts {
+      background: var(--light-mint);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .chart-container {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .chart-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chart-action {
+      background: var(--light-mint);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--dark);
+      transition: all 0.3s ease;
+    }
+
+    .chart-action:hover {
+      background: var(--teal);
+      color: white;
+    }
+
+    .chart-canvas-container {
+      height: 250px;
+      position: relative;
+    }
+
+    /* ===== УВЕДОМЛЕНИЯ ===== */
+    .alerts {
+      background: var(--white);
+    }
+
+    .alerts-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .alert-item {
+      padding: 1.5rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .alert-item:hover {
+      background: var(--light-mint);
+    }
+
+    .alert-item:last-child {
+      border-bottom: none;
+    }
+
+    .alert-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .alert-warning {
+      background: rgba(241, 196, 15, 0.2);
+      color: #f39c12;
+    }
+
+    .alert-danger {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
+    .alert-info {
+      background: rgba(52, 152, 219, 0.2);
+      color: #3498db;
+    }
+
+    .alert-content h4 {
+      font-size: 1rem;
+      color: var(--dark);
+      margin-bottom: 0.3rem;
+    }
+
+    .alert-content p {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .alert-time {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    footer {
+      background: var(--dark);
+      color: var(--white);
+      text-align: center;
+      padding: 2.5rem 1rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--white);
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--mint);
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .social-icons a {
+      color: var(--white);
+      font-size: 1.5rem;
+      transition: 0.3s;
+    }
+
+    .social-icons a:hover {
+      color: var(--mint);
+      transform: translateY(-5px);
+    }
+
+    @media (max-width: 768px) {
+      .hero h2 {
+        font-size: 2rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-container {
+        padding: 1rem;
+      }
+
+      .sensor-options {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header data-aos="fade-down">
+    <div class="logo">
+      <i class="fas fa-wind"></i>
+      <h1>Aquaris x S.I.T</h1>
+    </div>
+    <button>Выйти</button>
+  </header>
+
+  <section class="sensor-selector" data-aos="fade-up">
+    <h3 class="section-title">Выбор датчика</h3>
+    <div class="selector-container">
+      <div class="selector-title">Выберите тип измерений для просмотра</div>
+      <div class="sensor-options">
+        <div class="sensor-option active" data-type="temperature">
+          <i class="fas fa-thermometer-half"></i>
+          <span>Температура</span>
+        </div>
+        <div class="sensor-option" data-type="humidity">
+          <i class="fas fa-tint"></i>
+          <span>Влажность</span>
+        </div>
+        <div class="sensor-option" data-type="co2">
+          <i class="fas fa-smog"></i>
+          <span>CO₂</span>
+        </div>
+        <div class="sensor-option" data-type="uv">
+          <i class="fas fa-sun"></i>
+          <span>УФ-индекс</span>
+        </div>
+        <div class="sensor-option" data-type="pm">
+          <i class="fas fa-wind"></i>
+          <span>Частицы PM2.5/PM10</span>
+        </div>
+        <div class="sensor-option" data-type="pressure">
+          <i class="fas fa-weight-hanging"></i>
+          <span>Давление</span>
+        </div>
+        <div class="sensor-option" data-type="voc">
+          <i class="fas fa-flask"></i>
+          <span>ЛОС</span>
+        </div>
+        <div class="sensor-option" data-type="ammonia">
+          <i class="fas fa-atom"></i>
+          <span>Амиак (NH₃)</span>
+        </div>
+        <div class="sensor-option" data-type="nox">
+          <i class="fas fa-industry"></i>
+          <span>Оксиды азота (NOₓ)</span>
+        </div>
+        <div class="sensor-option" data-type="benzene">
+          <i class="fas fa-vial"></i>
+          <span>Бензол (C₆H₆)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard" data-aos="fade-up">
+    <h3 class="section-title">Показания датчика</h3>
+    <div class="dashboard-grid">
+      <!-- Температура -->
+      <div class="sensor-card" data-type="temperature">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-thermometer-half"></i>
+          </div>
+          <div class="sensor-status status-normal">Норма</div>
+        </div>
+        <div class="sensor-title">Температура</div>
+        <div class="sensor-value">22.5<span class="sensor-unit">°C</span></div>
+        <div class="sensor-average">Среднее за день: 21.8°C</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+0.3°C</span>
+          </div>
+          <div>Обновлено: 12:45</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Влажность -->
+      <div class="sensor-card" data-type="humidity">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-tint"></i>
+          </div>
+          <div class="sensor-status status-normal">Норма</div>
+        </div>
+        <div class="sensor-title">Влажность</div>
+        <div class="sensor-value">45<span class="sensor-unit">%</span></div>
+        <div class="sensor-average">Среднее за день: 47.2%</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-stable">
+            <i class="fas fa-minus"></i>
+            <span>0%</span>
+          </div>
+          <div>Обновлено: 12:45</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,30 L20,25 L40,30 L60,35 L80,30 L100,25"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- CO₂ -->
+      <div class="sensor-card" data-type="co2">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-smog"></i>
+          </div>
+          <div class="sensor-status status-warning">Выше нормы</div>
+        </div>
+        <div class="sensor-title">CO₂</div>
+        <div class="sensor-value">850<span class="sensor-unit">ppm</span></div>
+        <div class="sensor-average">Среднее за день: 720ppm</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+50ppm</span>
+          </div>
+          <div>Обновлено: 12:44</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,20 L20,25 L40,30 L60,25 L80,20 L100,15"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- УФ-индекс -->
+      <div class="sensor-card" data-type="uv">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-sun"></i>
+          </div>
+          <div class="sensor-status status-normal">Норма</div>
+        </div>
+        <div class="sensor-title">УФ-индекс</div>
+        <div class="sensor-value">3.2<span class="sensor-unit"></span></div>
+        <div class="sensor-average">Среднее за день: 2.8</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-down">
+            <i class="fas fa-arrow-down"></i>
+            <span>-0.5</span>
+          </div>
+          <div>Обновлено: 12:43</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,25 L20,20 L40,15 L60,20 L80,25 L100,20"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Частицы PM2.5 -->
+      <div class="sensor-card" data-type="pm">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-wind"></i>
+          </div>
+          <div class="sensor-status status-normal">Норма</div>
+        </div>
+        <div class="sensor-title">PM2.5</div>
+        <div class="sensor-value">12<span class="sensor-unit">µg/m³</span></div>
+        <div class="sensor-average">Среднее за день: 14.5µg/m³</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-down">
+            <i class="fas fa-arrow-down"></i>
+            <span>-2µg/m³</span>
+          </div>
+          <div>Обновлено: 12:43</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,25 L20,20 L40,15 L60,20 L80,25 L100,20"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Давление -->
+      <div class="sensor-card" data-type="pressure">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-weight-hanging"></i>
+          </div>
+          <div class="sensor-status status-normal">Норма</div>
+        </div>
+        <div class="sensor-title">Давление</div>
+        <div class="sensor-value">1013<span class="sensor-unit">hPa</span></div>
+        <div class="sensor-average">Среднее за день: 1012hPa</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-stable">
+            <i class="fas fa-minus"></i>
+            <span>0hPa</span>
+          </div>
+          <div>Обновлено: 12:45</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ЛОС -->
+      <div class="sensor-card" data-type="voc">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-flask"></i>
+          </div>
+          <div class="sensor-status status-danger">Критично</div>
+        </div>
+        <div class="sensor-title">ЛОС</div>
+        <div class="sensor-value">350<span class="sensor-unit">ppb</span></div>
+        <div class="sensor-average">Среднее за день: 280ppb</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+80ppb</span>
+          </div>
+          <div>Обновлено: 12:42</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,15 L20,20 L40,25 L60,30 L80,25 L100,20"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Амиак -->
+      <div class="sensor-card" data-type="ammonia">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-atom"></i>
+          </div>
+          <div class="sensor-status status-normal">Норма</div>
+        </div>
+        <div class="sensor-title">Амиак (NH₃)</div>
+        <div class="sensor-value">0.8<span class="sensor-unit">ppm</span></div>
+        <div class="sensor-average">Среднее за день: 0.7ppm</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-stable">
+            <i class="fas fa-minus"></i>
+            <span>0ppm</span>
+          </div>
+          <div>Обновлено: 12:41</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Оксиды азота -->
+      <div class="sensor-card" data-type="nox">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-industry"></i>
+          </div>
+          <div class="sensor-status status-warning">Выше нормы</div>
+        </div>
+        <div class="sensor-title">Оксиды азота (NOₓ)</div>
+        <div class="sensor-value">45<span class="sensor-unit">ppb</span></div>
+        <div class="sensor-average">Среднее за день: 38ppb</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-up">
+            <i class="fas fa-arrow-up"></i>
+            <span>+5ppb</span>
+          </div>
+          <div>Обновлено: 12:40</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,20 L20,25 L40,30 L60,25 L80,20 L100,15"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Бензол -->
+      <div class="sensor-card" data-type="benzene">
+        <div class="sensor-header">
+          <div class="sensor-icon">
+            <i class="fas fa-vial"></i>
+          </div>
+          <div class="sensor-status status-normal">Норма</div>
+        </div>
+        <div class="sensor-title">Бензол (C₆H₆)</div>
+        <div class="sensor-value">2.5<span class="sensor-unit">ppb</span></div>
+        <div class="sensor-average">Среднее за день: 2.3ppb</div>
+        <div class="sensor-details">
+          <div class="sensor-trend trend-stable">
+            <i class="fas fa-minus"></i>
+            <span>0ppb</span>
+          </div>
+          <div>Обновлено: 12:39</div>
+        </div>
+        <div class="sensor-history">
+          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path d="M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="charts" data-aos="fade-up">
+    <h3 class="section-title">Графики показаний</h3>
+    <div class="charts-grid">
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">Температура и влажность</div>
+          <div class="chart-actions">
+            <button class="chart-action"><i class="fas fa-expand"></i></button>
+            <button class="chart-action"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="tempHumidityChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">Качество воздуха (CO₂ и PM2.5)</div>
+          <div class="chart-actions">
+            <button class="chart-action"><i class="fas fa-expand"></i></button>
+            <button class="chart-action"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="airQualityChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">Загрязняющие вещества</div>
+          <div class="chart-actions">
+            <button class="chart-action"><i class="fas fa-expand"></i></button>
+            <button class="chart-action"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="pollutantsChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="chart-title">Давление и УФ-индекс</div>
+          <div class="chart-actions">
+            <button class="chart-action"><i class="fas fa-expand"></i></button>
+            <button class="chart-action"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+        <div class="chart-canvas-container">
+          <canvas id="pressureUvChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alerts" data-aos="fade-up">
+    <h3 class="section-title">Последние уведомления</h3>
+    <div class="alerts-container">
+      <div class="alert-item">
+        <div class="alert-icon alert-danger">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="alert-content">
+          <h4>Высокий уровень ЛОС</h4>
+          <p>Уровень летучих органических соединений превысил допустимый предел</p>
+        </div>
+        <div class="alert-time">12:42</div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-icon alert-warning">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="alert-content">
+          <h4>Повышенный уровень CO₂</h4>
+          <p>Концентрация углекислого газа приближается к верхней границе нормы</p>
+        </div>
+        <div class="alert-time">12:30</div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-icon alert-warning">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="alert-content">
+          <h4>Повышенный уровень оксидов азота</h4>
+          <p>Концентрация NOₓ превысила средние значения</p>
+        </div>
+        <div class="alert-time">12:15</div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-icon alert-info">
+          <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="alert-content">
+          <h4>Обновление данных</h4>
+          <p>Все датчики успешно передали данные за последний час</p>
+        </div>
+        <div class="alert-time">12:00</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#">О проекте</a>
+        <a href="#">Документация</a>
+        <a href="#">Контакты</a>
+        <a href="#">Политика конфиденциальности</a>
+      </div>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-telegram"></i></a>
+        <a href="#"><i class="fab fa-vk"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+        <a href="#"><i class="fab fa-github"></i></a>
+      </div>
+      <p>2025 Aquaris x S.I.T | Расширенный дэшборд сенсоров</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100
+    });
+
+    // Выбор датчика
+    document.querySelectorAll('.sensor-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Убираем активный класс у всех опций
+        document.querySelectorAll('.sensor-option').forEach(opt => {
+          opt.classList.remove('active');
+        });
+        
+        // Добавляем активный класс к выбранной опции
+        this.classList.add('active');
+        
+        // Прокручиваем к соответствующей карточке датчика
+        const sensorType = this.getAttribute('data-type');
+        const sensorCard = document.querySelector(`.sensor-card[data-type="${sensorType}"]`);
+        if (sensorCard) {
+          sensorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          
+          // Добавляем подсветку на 2 секунды
+          sensorCard.style.boxShadow = '0 0 0 3px var(--teal)';
+          setTimeout(() => {
+            sensorCard.style.boxShadow = '';
+          }, 2000);
+        }
+      });
+    });
+
+    // Инициализация графиков
+    function initCharts() {
+      // График температуры и влажности
+      const tempHumidityCtx = document.getElementById('tempHumidityChart').getContext('2d');
+      new Chart(tempHumidityCtx, {
+        type: 'line',
+        data: {
+          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+          datasets: [
+            {
+              label: 'Температура (°C)',
+              data: [19.2, 18.5, 19.8, 21.5, 22.8, 23.2, 21.5, 20.1],
+              borderColor: '#e74c3c',
+              backgroundColor: 'rgba(231, 76, 60, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Влажность (%)',
+              data: [52, 55, 48, 42, 38, 40, 45, 50],
+              borderColor: '#3498db',
+              backgroundColor: 'rgba(52, 152, 219, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Температура (°C)'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'Влажность (%)'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+
+      // График качества воздуха
+      const airQualityCtx = document.getElementById('airQualityChart').getContext('2d');
+      new Chart(airQualityCtx, {
+        type: 'line',
+        data: {
+          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+          datasets: [
+            {
+              label: 'CO₂ (ppm)',
+              data: [650, 620, 580, 610, 720, 780, 850, 800],
+              borderColor: '#9b59b6',
+              backgroundColor: 'rgba(155, 89, 182, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'PM2.5 (µg/m³)',
+              data: [18, 16, 14, 12, 10, 11, 13, 15],
+              borderColor: '#f39c12',
+              backgroundColor: 'rgba(243, 156, 18, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'CO₂ (ppm)'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'PM2.5 (µg/m³)'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+
+      // График загрязняющих веществ
+      const pollutantsCtx = document.getElementById('pollutantsChart').getContext('2d');
+      new Chart(pollutantsCtx, {
+        type: 'bar',
+        data: {
+          labels: ['ЛОС', 'Амиак', 'NOₓ', 'Бензол'],
+          datasets: [{
+            label: 'Концентрация',
+            data: [350, 0.8, 45, 2.5],
+            backgroundColor: [
+              'rgba(231, 76, 60, 0.7)',
+              'rgba(52, 152, 219, 0.7)',
+              'rgba(243, 156, 18, 0.7)',
+              'rgba(46, 204, 113, 0.7)'
+            ],
+            borderColor: [
+              'rgb(231, 76, 60)',
+              'rgb(52, 152, 219)',
+              'rgb(243, 156, 18)',
+              'rgb(46, 204, 113)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // График давления и УФ-индекса
+      const pressureUvCtx = document.getElementById('pressureUvChart').getContext('2d');
+      new Chart(pressureUvCtx, {
+        type: 'line',
+        data: {
+          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+          datasets: [
+            {
+              label: 'Давление (hPa)',
+              data: [1010, 1011, 1012, 1013, 1013, 1012, 1011, 1010],
+              borderColor: '#34495e',
+              backgroundColor: 'rgba(52, 73, 94, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'УФ-индекс',
+              data: [0, 0, 1.2, 2.8, 3.5, 2.2, 0.8, 0],
+              borderColor: '#f1c40f',
+              backgroundColor: 'rgba(241, 196, 15, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Давление (hPa)'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
+                display: true,
+                text: 'УФ-индекс'
+              },
+              grid: {
+                drawOnChartArea: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Инициализация графиков после загрузки страницы
+    document.addEventListener('DOMContentLoaded', initCharts);
+
+    // Имитация обновления данных
+    function updateSensorData() {
+      const sensors = document.querySelectorAll('.sensor-card');
+      
+      sensors.forEach(sensor => {
+        const valueElement = sensor.querySelector('.sensor-value');
+        const timeElement = sensor.querySelector('.sensor-details div:last-child');
+        const trendElement = sensor.querySelector('.sensor-trend span');
+        const averageElement = sensor.querySelector('.sensor-average');
+        
+        // Текущее время
+        const now = new Date();
+        const timeString = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+        timeElement.textContent = 'Обновлено: ' + timeString;
+        
+        // Случайное изменение значений (в реальном приложении здесь был бы запрос к API)
+        const currentValue = parseFloat(valueElement.textContent);
+        const change = (Math.random() - 0.5) * 2; // от -1 до 1
+        const newValue = Math.max(0, currentValue + change);
+        
+        // Обновление значения с округлением
+        const unit = valueElement.querySelector('.sensor-unit').textContent;
+        valueElement.innerHTML = newValue.toFixed(unit === '°C' || unit === '' ? 1 : 0) + '<span class="sensor-unit">' + unit + '</span>';
+        
+        // Обновление среднего значения
+        const currentAvg = parseFloat(averageElement.textContent.split(': ')[1]);
+        const newAvg = (currentAvg + newValue) / 2;
+        averageElement.textContent = 'Среднее за день: ' + newAvg.toFixed(1) + unit;
+        
+        // Обновление тренда
+        const trendIcon = trendElement.parentElement.querySelector('i');
+        const trendValue = trendElement;
+        
+        if (change > 0.1) {
+          trendIcon.className = 'fas fa-arrow-up';
+          trendIcon.parentElement.className = 'sensor-trend trend-up';
+          trendValue.textContent = '+' + change.toFixed(1) + (unit === '°C' ? '°C' : unit);
+        } else if (change < -0.1) {
+          trendIcon.className = 'fas fa-arrow-down';
+          trendIcon.parentElement.className = 'sensor-trend trend-down';
+          trendValue.textContent = change.toFixed(1) + (unit === '°C' ? '°C' : unit);
+        } else {
+          trendIcon.className = 'fas fa-minus';
+          trendIcon.parentElement.className = 'sensor-trend trend-stable';
+          trendValue.textContent = '0' + (unit === '°C' ? '°C' : unit);
+        }
+      });
+    }
+
+    // Обновление данных каждые 30 секунд
+    setInterval(updateSensorData, 30000);
+  </script>
+</body>
+</html>
