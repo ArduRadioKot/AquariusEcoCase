@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aquaris x S.I.T | Расширенный дэшборд сенсоров</title>
+  <title>Aquaris x S.I.T | Дэшборд по местоположению</title>
 
   <!-- Шрифт и AOS-анимации -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -157,8 +157,8 @@
       border-radius: 5px;
     }
 
-    /* ===== ВЫБОР ДАТЧИКА ===== */
-    .sensor-selector {
+    /* ===== ВЫБОР МЕСТОПОЛОЖЕНИЯ ===== */
+    .location-selector {
       background: var(--light-mint);
     }
 
@@ -178,53 +178,180 @@
       text-align: center;
     }
 
-    .sensor-options {
+    .location-options {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
     }
 
-    .sensor-option {
+    .location-option {
       background: var(--light-mint);
       border: 2px solid transparent;
       border-radius: 12px;
-      padding: 1.5rem 1rem;
-      text-align: center;
+      padding: 1.5rem;
       cursor: pointer;
       transition: all 0.3s ease;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 0.8rem;
+      gap: 1rem;
     }
 
-    .sensor-option:hover {
+    .location-option:hover {
       transform: translateY(-5px);
       box-shadow: var(--shadow);
     }
 
-    .sensor-option.active {
+    .location-option.active {
       border-color: var(--teal);
       background: var(--gradient-light);
       color: white;
     }
 
-    .sensor-option.active i {
+    .location-option.active .location-icon,
+    .location-option.active .location-status {
       color: white;
     }
 
-    .sensor-option i {
-      font-size: 2rem;
-      color: var(--teal);
+    .location-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
-    .sensor-option span {
-      font-weight: 500;
+    .location-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient);
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .location-info {
+      flex: 1;
+    }
+
+    .location-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .location-address {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .location-status {
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(46, 204, 113, 0.2);
+      color: #27ae60;
+    }
+
+    .status-offline {
+      background: rgba(149, 165, 166, 0.2);
+      color: #7f8c8d;
+    }
+
+    .location-sensors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .sensor-tag {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.3rem 0.7rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .location-option.active .sensor-tag {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    /* ===== ИНФОРМАЦИЯ О ВЫБРАННОМ ДАТЧИКЕ ===== */
+    .sensor-info {
+      background: var(--white);
+      margin-top: 2rem;
+    }
+
+    .sensor-header {
+      max-width: 1200px;
+      margin: 0 auto 2rem;
+      background: var(--light-mint);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .sensor-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 3rem;
+    }
+
+    .sensor-details {
+      flex: 1;
+    }
+
+    .sensor-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .sensor-location {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .sensor-meta {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .meta-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark);
     }
 
     /* ===== ДЭШБОРД ===== */
     .dashboard {
-      background: var(--white);
+      background: var(--light-mint);
     }
 
     .dashboard-grid {
@@ -251,14 +378,14 @@
       box-shadow: 0 15px 35px rgba(0,0,0,0.12);
     }
 
-    .sensor-header {
+    .sensor-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
     }
 
-    .sensor-icon {
+    .sensor-card-icon {
       width: 60px;
       height: 60px;
       border-radius: 50%;
@@ -270,7 +397,7 @@
       font-size: 1.5rem;
     }
 
-    .sensor-status {
+    .sensor-card-status {
       padding: 0.3rem 1rem;
       border-radius: 20px;
       font-size: 0.8rem;
@@ -292,27 +419,27 @@
       color: #e74c3c;
     }
 
-    .sensor-title {
+    .sensor-card-title {
       font-size: 1.2rem;
       font-weight: 600;
       color: var(--dark);
       margin-bottom: 0.5rem;
     }
 
-    .sensor-value {
+    .sensor-card-value {
       font-size: 2.5rem;
       font-weight: 700;
       margin: 1rem 0;
       color: var(--dark);
     }
 
-    .sensor-unit {
+    .sensor-card-unit {
       font-size: 1rem;
       color: #666;
       margin-left: 0.3rem;
     }
 
-    .sensor-details {
+    .sensor-card-details {
       display: flex;
       justify-content: space-between;
       margin-top: 1rem;
@@ -320,7 +447,7 @@
       color: #666;
     }
 
-    .sensor-trend {
+    .sensor-card-trend {
       display: flex;
       align-items: center;
       gap: 0.3rem;
@@ -338,13 +465,13 @@
       color: #3498db;
     }
 
-    .sensor-average {
+    .sensor-card-average {
       margin-top: 0.5rem;
       font-size: 0.9rem;
       color: #666;
     }
 
-    .sensor-history {
+    .sensor-card-history {
       height: 60px;
       margin-top: 1rem;
       border-radius: 8px;
@@ -366,7 +493,7 @@
 
     /* ===== ГРАФИКИ ===== */
     .charts {
-      background: var(--light-mint);
+      background: var(--white);
     }
 
     .charts-grid {
@@ -382,6 +509,7 @@
       border-radius: var(--radius);
       padding: 1.5rem;
       box-shadow: var(--shadow);
+      border: 1px solid #eee;
     }
 
     .chart-header {
@@ -428,7 +556,7 @@
 
     /* ===== УВЕДОМЛЕНИЯ ===== */
     .alerts {
-      background: var(--white);
+      background: var(--light-mint);
     }
 
     .alerts-container {
@@ -548,6 +676,18 @@
       transform: translateY(-5px);
     }
 
+    .no-data {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+
+    .no-data i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      color: #ddd;
+    }
+
     @media (max-width: 768px) {
       .hero h2 {
         font-size: 2rem;
@@ -565,8 +705,17 @@
         padding: 1rem;
       }
 
-      .sensor-options {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      .location-options {
+        grid-template-columns: 1fr;
+      }
+
+      .sensor-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .sensor-meta {
+        justify-content: center;
       }
     }
   </style>
@@ -576,312 +725,133 @@
   <header data-aos="fade-down">
     <div class="logo">
       <i class="fas fa-wind"></i>
-      <h1>Aquaris x S.I.T</h1>
+      <h1>Aquaris x S.I.T | Дэшборд по местоположению</h1>
     </div>
     <button>Выйти</button>
   </header>
 
-  <section class="sensor-selector" data-aos="fade-up">
-    <h3 class="section-title">Выбор датчика</h3>
+  <section class="hero" data-aos="fade-up">
+    <div class="hero-content">
+      <h2>Дэшборд показаний сенсоров</h2>
+      <p>Выберите местоположение датчика для просмотра всех показаний</p>
+    </div>
+  </section>
+
+  <section class="location-selector" data-aos="fade-up">
+    <h3 class="section-title">Выбор местоположения</h3>
     <div class="selector-container">
-      <div class="selector-title">Выберите тип измерений для просмотра</div>
-      <div class="sensor-options">
-        <div class="sensor-option active" data-type="temperature">
-          <i class="fas fa-thermometer-half"></i>
-          <span>Температура</span>
+      <div class="selector-title">Выберите датчик для просмотра показаний</div>
+      <div class="location-options">
+        <div class="location-option active" data-location="office">
+          <div class="location-header">
+            <div class="location-icon">
+              <i class="fas fa-building"></i>
+            </div>
+            <div class="location-info">
+              <div class="location-name">Офисное здание</div>
+              <div class="location-address">ул. Ленина, 25, этаж 3</div>
+            </div>
+            <div class="location-status">Online</div>
+          </div>
+          <div class="location-sensors">
+            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
+            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
+            <div class="sensor-tag"><i class="fas fa-smog"></i> CO₂</div>
+            <div class="sensor-tag"><i class="fas fa-wind"></i> PM2.5</div>
+          </div>
         </div>
-        <div class="sensor-option" data-type="humidity">
-          <i class="fas fa-tint"></i>
-          <span>Влажность</span>
+
+        <div class="location-option" data-location="production">
+          <div class="location-header">
+            <div class="location-icon">
+              <i class="fas fa-industry"></i>
+            </div>
+            <div class="location-info">
+              <div class="location-name">Производственный цех</div>
+              <div class="location-address">пр. Победы, 104, цех №2</div>
+            </div>
+            <div class="location-status">Online</div>
+          </div>
+          <div class="location-sensors">
+            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
+            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
+            <div class="sensor-tag"><i class="fas fa-flask"></i> ЛОС</div>
+            <div class="sensor-tag"><i class="fas fa-atom"></i> Амиак</div>
+            <div class="sensor-tag"><i class="fas fa-industry"></i> NOₓ</div>
+          </div>
         </div>
-        <div class="sensor-option" data-type="co2">
-          <i class="fas fa-smog"></i>
-          <span>CO₂</span>
+
+        <div class="location-option" data-location="laboratory">
+          <div class="location-header">
+            <div class="location-icon">
+              <i class="fas fa-flask"></i>
+            </div>
+            <div class="location-info">
+              <div class="location-name">Исследовательская лаборатория</div>
+              <div class="location-address">ул. Академическая, 15, корп. Б</div>
+            </div>
+            <div class="location-status">Online</div>
+          </div>
+          <div class="location-sensors">
+            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
+            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
+            <div class="sensor-tag"><i class="fas fa-weight-hanging"></i> Давление</div>
+            <div class="sensor-tag"><i class="fas fa-vial"></i> Бензол</div>
+            <div class="sensor-tag"><i class="fas fa-flask"></i> ЛОС</div>
+          </div>
         </div>
-        <div class="sensor-option" data-type="uv">
-          <i class="fas fa-sun"></i>
-          <span>УФ-индекс</span>
+
+        <div class="location-option" data-location="warehouse">
+          <div class="location-header">
+            <div class="location-icon">
+              <i class="fas fa-warehouse"></i>
+            </div>
+            <div class="location-info">
+              <div class="location-name">Складское помещение</div>
+              <div class="location-address">ул. Складская, 7, зона А</div>
+            </div>
+            <div class="location-status status-offline">Offline</div>
+          </div>
+          <div class="location-sensors">
+            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
+            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
+            <div class="sensor-tag"><i class="fas fa-smog"></i> CO₂</div>
+          </div>
         </div>
-        <div class="sensor-option" data-type="pm">
-          <i class="fas fa-wind"></i>
-          <span>Частицы PM2.5/PM10</span>
-        </div>
-        <div class="sensor-option" data-type="pressure">
-          <i class="fas fa-weight-hanging"></i>
-          <span>Давление</span>
-        </div>
-        <div class="sensor-option" data-type="voc">
-          <i class="fas fa-flask"></i>
-          <span>ЛОС</span>
-        </div>
-        <div class="sensor-option" data-type="ammonia">
-          <i class="fas fa-atom"></i>
-          <span>Амиак (NH₃)</span>
-        </div>
-        <div class="sensor-option" data-type="nox">
-          <i class="fas fa-industry"></i>
-          <span>Оксиды азота (NOₓ)</span>
-        </div>
-        <div class="sensor-option" data-type="benzene">
-          <i class="fas fa-vial"></i>
-          <span>Бензол (C₆H₆)</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sensor-info" data-aos="fade-up">
+    <div class="sensor-header">
+      <div class="sensor-image">
+        <i class="fas fa-building"></i>
+      </div>
+      <div class="sensor-details">
+        <div class="sensor-title">Офисное здание</div>
+        <div class="sensor-location">ул. Ленина, 25, этаж 3</div>
+        <div class="sensor-meta">
+          <div class="meta-item">
+            <div class="meta-label">Статус</div>
+            <div class="meta-value">Online</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Последнее обновление</div>
+            <div class="meta-value">12:45</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Кол-во датчиков</div>
+            <div class="meta-value">4</div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <section class="dashboard" data-aos="fade-up">
-    <h3 class="section-title">Показания датчика</h3>
-    <div class="dashboard-grid">
-      <!-- Температура -->
-      <div class="sensor-card" data-type="temperature">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-thermometer-half"></i>
-          </div>
-          <div class="sensor-status status-normal">Норма</div>
-        </div>
-        <div class="sensor-title">Температура</div>
-        <div class="sensor-value">22.5<span class="sensor-unit">°C</span></div>
-        <div class="sensor-average">Среднее за день: 21.8°C</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-up">
-            <i class="fas fa-arrow-up"></i>
-            <span>+0.3°C</span>
-          </div>
-          <div>Обновлено: 12:45</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,40 L20,35 L40,30 L60,25 L80,20 L100,15"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Влажность -->
-      <div class="sensor-card" data-type="humidity">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-tint"></i>
-          </div>
-          <div class="sensor-status status-normal">Норма</div>
-        </div>
-        <div class="sensor-title">Влажность</div>
-        <div class="sensor-value">45<span class="sensor-unit">%</span></div>
-        <div class="sensor-average">Среднее за день: 47.2%</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-stable">
-            <i class="fas fa-minus"></i>
-            <span>0%</span>
-          </div>
-          <div>Обновлено: 12:45</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,30 L20,25 L40,30 L60,35 L80,30 L100,25"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- CO₂ -->
-      <div class="sensor-card" data-type="co2">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-smog"></i>
-          </div>
-          <div class="sensor-status status-warning">Выше нормы</div>
-        </div>
-        <div class="sensor-title">CO₂</div>
-        <div class="sensor-value">850<span class="sensor-unit">ppm</span></div>
-        <div class="sensor-average">Среднее за день: 720ppm</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-up">
-            <i class="fas fa-arrow-up"></i>
-            <span>+50ppm</span>
-          </div>
-          <div>Обновлено: 12:44</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,20 L20,25 L40,30 L60,25 L80,20 L100,15"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- УФ-индекс -->
-      <div class="sensor-card" data-type="uv">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-sun"></i>
-          </div>
-          <div class="sensor-status status-normal">Норма</div>
-        </div>
-        <div class="sensor-title">УФ-индекс</div>
-        <div class="sensor-value">3.2<span class="sensor-unit"></span></div>
-        <div class="sensor-average">Среднее за день: 2.8</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-down">
-            <i class="fas fa-arrow-down"></i>
-            <span>-0.5</span>
-          </div>
-          <div>Обновлено: 12:43</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,25 L20,20 L40,15 L60,20 L80,25 L100,20"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Частицы PM2.5 -->
-      <div class="sensor-card" data-type="pm">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-wind"></i>
-          </div>
-          <div class="sensor-status status-normal">Норма</div>
-        </div>
-        <div class="sensor-title">PM2.5</div>
-        <div class="sensor-value">12<span class="sensor-unit">µg/m³</span></div>
-        <div class="sensor-average">Среднее за день: 14.5µg/m³</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-down">
-            <i class="fas fa-arrow-down"></i>
-            <span>-2µg/m³</span>
-          </div>
-          <div>Обновлено: 12:43</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,25 L20,20 L40,15 L60,20 L80,25 L100,20"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Давление -->
-      <div class="sensor-card" data-type="pressure">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-weight-hanging"></i>
-          </div>
-          <div class="sensor-status status-normal">Норма</div>
-        </div>
-        <div class="sensor-title">Давление</div>
-        <div class="sensor-value">1013<span class="sensor-unit">hPa</span></div>
-        <div class="sensor-average">Среднее за день: 1012hPa</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-stable">
-            <i class="fas fa-minus"></i>
-            <span>0hPa</span>
-          </div>
-          <div>Обновлено: 12:45</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- ЛОС -->
-      <div class="sensor-card" data-type="voc">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-flask"></i>
-          </div>
-          <div class="sensor-status status-danger">Критично</div>
-        </div>
-        <div class="sensor-title">ЛОС</div>
-        <div class="sensor-value">350<span class="sensor-unit">ppb</span></div>
-        <div class="sensor-average">Среднее за день: 280ppb</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-up">
-            <i class="fas fa-arrow-up"></i>
-            <span>+80ppb</span>
-          </div>
-          <div>Обновлено: 12:42</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,15 L20,20 L40,25 L60,30 L80,25 L100,20"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Амиак -->
-      <div class="sensor-card" data-type="ammonia">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-atom"></i>
-          </div>
-          <div class="sensor-status status-normal">Норма</div>
-        </div>
-        <div class="sensor-title">Амиак (NH₃)</div>
-        <div class="sensor-value">0.8<span class="sensor-unit">ppm</span></div>
-        <div class="sensor-average">Среднее за день: 0.7ppm</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-stable">
-            <i class="fas fa-minus"></i>
-            <span>0ppm</span>
-          </div>
-          <div>Обновлено: 12:41</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Оксиды азота -->
-      <div class="sensor-card" data-type="nox">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-industry"></i>
-          </div>
-          <div class="sensor-status status-warning">Выше нормы</div>
-        </div>
-        <div class="sensor-title">Оксиды азота (NOₓ)</div>
-        <div class="sensor-value">45<span class="sensor-unit">ppb</span></div>
-        <div class="sensor-average">Среднее за день: 38ppb</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-up">
-            <i class="fas fa-arrow-up"></i>
-            <span>+5ppb</span>
-          </div>
-          <div>Обновлено: 12:40</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,20 L20,25 L40,30 L60,25 L80,20 L100,15"></path>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Бензол -->
-      <div class="sensor-card" data-type="benzene">
-        <div class="sensor-header">
-          <div class="sensor-icon">
-            <i class="fas fa-vial"></i>
-          </div>
-          <div class="sensor-status status-normal">Норма</div>
-        </div>
-        <div class="sensor-title">Бензол (C₆H₆)</div>
-        <div class="sensor-value">2.5<span class="sensor-unit">ppb</span></div>
-        <div class="sensor-average">Среднее за день: 2.3ppb</div>
-        <div class="sensor-details">
-          <div class="sensor-trend trend-stable">
-            <i class="fas fa-minus"></i>
-            <span>0ppb</span>
-          </div>
-          <div>Обновлено: 12:39</div>
-        </div>
-        <div class="sensor-history">
-          <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"></path>
-          </svg>
-        </div>
-      </div>
+    <h3 class="section-title">Показания датчиков</h3>
+    <div class="dashboard-grid" id="sensorData">
+      <!-- Данные будут заполняться динамически -->
     </div>
   </section>
 
@@ -902,7 +872,7 @@
       </div>
       <div class="chart-container">
         <div class="chart-header">
-          <div class="chart-title">Качество воздуха (CO₂ и PM2.5)</div>
+          <div class="chart-title">Качество воздуха</div>
           <div class="chart-actions">
             <button class="chart-action"><i class="fas fa-expand"></i></button>
             <button class="chart-action"><i class="fas fa-download"></i></button>
@@ -912,76 +882,13 @@
           <canvas id="airQualityChart"></canvas>
         </div>
       </div>
-      <div class="chart-container">
-        <div class="chart-header">
-          <div class="chart-title">Загрязняющие вещества</div>
-          <div class="chart-actions">
-            <button class="chart-action"><i class="fas fa-expand"></i></button>
-            <button class="chart-action"><i class="fas fa-download"></i></button>
-          </div>
-        </div>
-        <div class="chart-canvas-container">
-          <canvas id="pollutantsChart"></canvas>
-        </div>
-      </div>
-      <div class="chart-container">
-        <div class="chart-header">
-          <div class="chart-title">Давление и УФ-индекс</div>
-          <div class="chart-actions">
-            <button class="chart-action"><i class="fas fa-expand"></i></button>
-            <button class="chart-action"><i class="fas fa-download"></i></button>
-          </div>
-        </div>
-        <div class="chart-canvas-container">
-          <canvas id="pressureUvChart"></canvas>
-        </div>
-      </div>
     </div>
   </section>
 
   <section class="alerts" data-aos="fade-up">
     <h3 class="section-title">Последние уведомления</h3>
-    <div class="alerts-container">
-      <div class="alert-item">
-        <div class="alert-icon alert-danger">
-          <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="alert-content">
-          <h4>Высокий уровень ЛОС</h4>
-          <p>Уровень летучих органических соединений превысил допустимый предел</p>
-        </div>
-        <div class="alert-time">12:42</div>
-      </div>
-      <div class="alert-item">
-        <div class="alert-icon alert-warning">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
-        <div class="alert-content">
-          <h4>Повышенный уровень CO₂</h4>
-          <p>Концентрация углекислого газа приближается к верхней границе нормы</p>
-        </div>
-        <div class="alert-time">12:30</div>
-      </div>
-      <div class="alert-item">
-        <div class="alert-icon alert-warning">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
-        <div class="alert-content">
-          <h4>Повышенный уровень оксидов азота</h4>
-          <p>Концентрация NOₓ превысила средние значения</p>
-        </div>
-        <div class="alert-time">12:15</div>
-      </div>
-      <div class="alert-item">
-        <div class="alert-icon alert-info">
-          <i class="fas fa-info-circle"></i>
-        </div>
-        <div class="alert-content">
-          <h4>Обновление данных</h4>
-          <p>Все датчики успешно передали данные за последний час</p>
-        </div>
-        <div class="alert-time">12:00</div>
-      </div>
+    <div class="alerts-container" id="alertsContainer">
+      <!-- Уведомления будут заполняться динамически -->
     </div>
   </section>
 
@@ -999,7 +906,7 @@
         <a href="#"><i class="fab fa-youtube"></i></a>
         <a href="#"><i class="fab fa-github"></i></a>
       </div>
-      <p>2025 Aquaris x S.I.T | Расширенный дэшборд сенсоров</p>
+      <p>2025 Aquaris x S.I.T | Дэшборд по местоположению</p>
     </div>
   </footer>
 
@@ -1011,44 +918,196 @@
       offset: 100
     });
 
-    // Выбор датчика
-    document.querySelectorAll('.sensor-option').forEach(option => {
-      option.addEventListener('click', function() {
-        // Убираем активный класс у всех опций
-        document.querySelectorAll('.sensor-option').forEach(opt => {
-          opt.classList.remove('active');
-        });
-        
-        // Добавляем активный класс к выбранной опции
-        this.classList.add('active');
-        
-        // Прокручиваем к соответствующей карточке датчика
-        const sensorType = this.getAttribute('data-type');
-        const sensorCard = document.querySelector(`.sensor-card[data-type="${sensorType}"]`);
-        if (sensorCard) {
-          sensorCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          
-          // Добавляем подсветку на 2 секунды
-          sensorCard.style.boxShadow = '0 0 0 3px var(--teal)';
-          setTimeout(() => {
-            sensorCard.style.boxShadow = '';
-          }, 2000);
-        }
-      });
-    });
+    // Данные для разных местоположений
+    const locationData = {
+      office: {
+        name: "Офисное здание",
+        address: "ул. Ленина, 25, этаж 3",
+        status: "Online",
+        sensors: 4,
+        icon: "building",
+        sensorData: [
+          { type: "temperature", name: "Температура", value: 22.5, unit: "°C", average: 21.8, trend: "up", change: 0.3, status: "normal", icon: "thermometer-half" },
+          { type: "humidity", name: "Влажность", value: 45, unit: "%", average: 47.2, trend: "stable", change: 0, status: "normal", icon: "tint" },
+          { type: "co2", name: "CO₂", value: 850, unit: "ppm", average: 720, trend: "up", change: 50, status: "warning", icon: "smog" },
+          { type: "pm", name: "PM2.5", value: 12, unit: "µg/m³", average: 14.5, trend: "down", change: 2, status: "normal", icon: "wind" }
+        ],
+        alerts: [
+          { type: "warning", title: "Повышенный уровень CO₂", message: "Концентрация углекислого газа приближается к верхней границе нормы", time: "12:30" }
+        ]
+      },
+      production: {
+        name: "Производственный цех",
+        address: "пр. Победы, 104, цех №2",
+        status: "Online",
+        sensors: 5,
+        icon: "industry",
+        sensorData: [
+          { type: "temperature", name: "Температура", value: 26.8, unit: "°C", average: 25.2, trend: "up", change: 0.5, status: "warning", icon: "thermometer-half" },
+          { type: "humidity", name: "Влажность", value: 38, unit: "%", average: 40.1, trend: "down", change: 1.2, status: "normal", icon: "tint" },
+          { type: "voc", name: "ЛОС", value: 420, unit: "ppb", average: 380, trend: "up", change: 25, status: "danger", icon: "flask" },
+          { type: "ammonia", name: "Амиак (NH₃)", value: 1.2, unit: "ppm", average: 0.9, trend: "up", change: 0.1, status: "warning", icon: "atom" },
+          { type: "nox", name: "Оксиды азота (NOₓ)", value: 65, unit: "ppb", average: 52, trend: "up", change: 8, status: "danger", icon: "industry" }
+        ],
+        alerts: [
+          { type: "danger", title: "Высокий уровень ЛОС", message: "Уровень летучих органических соединений превысил допустимый предел", time: "12:42" },
+          { type: "danger", title: "Критичный уровень NOₓ", message: "Концентрация оксидов азота достигла опасных значений", time: "12:25" },
+          { type: "warning", title: "Повышенная температура", message: "Температура в цехе превышает комфортные значения", time: "11:50" }
+        ]
+      },
+      laboratory: {
+        name: "Исследовательская лаборатория",
+        address: "ул. Академическая, 15, корп. Б",
+        status: "Online",
+        sensors: 5,
+        icon: "flask",
+        sensorData: [
+          { type: "temperature", name: "Температура", value: 21.2, unit: "°C", average: 21.5, trend: "down", change: 0.2, status: "normal", icon: "thermometer-half" },
+          { type: "humidity", name: "Влажность", value: 52, unit: "%", average: 50.8, trend: "up", change: 1.5, status: "normal", icon: "tint" },
+          { type: "pressure", name: "Давление", value: 1012, unit: "hPa", average: 1011, trend: "stable", change: 0, status: "normal", icon: "weight-hanging" },
+          { type: "benzene", name: "Бензол (C₆H₆)", value: 1.8, unit: "ppb", average: 1.9, trend: "down", change: 0.1, status: "normal", icon: "vial" },
+          { type: "voc", name: "ЛОС", value: 185, unit: "ppb", average: 192, trend: "down", change: 5, status: "normal", icon: "flask" }
+        ],
+        alerts: [
+          { type: "info", title: "Все показатели в норме", message: "Все датчики показывают значения в пределах нормы", time: "12:45" }
+        ]
+      },
+      warehouse: {
+        name: "Складское помещение",
+        address: "ул. Складская, 7, зона А",
+        status: "Offline",
+        sensors: 3,
+        icon: "warehouse",
+        sensorData: [],
+        alerts: [
+          { type: "warning", title: "Датчик offline", message: "Складской датчик не передает данные более 2 часов", time: "10:30" }
+        ]
+      }
+    };
 
-    // Инициализация графиков
-    function initCharts() {
+    let currentCharts = [];
+
+    // Функция для отображения данных выбранного местоположения
+    function showLocationData(locationId) {
+      const location = locationData[locationId];
+      
+      // Обновляем заголовок с информацией о датчике
+      const sensorHeader = document.querySelector('.sensor-header');
+      sensorHeader.querySelector('.sensor-image i').className = `fas fa-${location.icon}`;
+      sensorHeader.querySelector('.sensor-title').textContent = location.name;
+      sensorHeader.querySelector('.sensor-location').textContent = location.address;
+      sensorHeader.querySelector('.meta-value').textContent = location.status;
+      sensorHeader.querySelectorAll('.meta-value')[1].textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      sensorHeader.querySelectorAll('.meta-value')[2].textContent = location.sensors;
+      
+      // Обновляем данные датчиков
+      const sensorDataContainer = document.getElementById('sensorData');
+      
+      if (location.sensorData.length === 0) {
+        sensorDataContainer.innerHTML = `
+          <div class="no-data">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Данные недоступны</h3>
+            <p>Датчик в настоящее время offline и не передает данные</p>
+          </div>
+        `;
+      } else {
+        sensorDataContainer.innerHTML = location.sensorData.map(sensor => `
+          <div class="sensor-card">
+            <div class="sensor-card-header">
+              <div class="sensor-card-icon">
+                <i class="fas fa-${sensor.icon}"></i>
+              </div>
+              <div class="sensor-card-status status-${sensor.status}">${getStatusText(sensor.status)}</div>
+            </div>
+            <div class="sensor-card-title">${sensor.name}</div>
+            <div class="sensor-card-value">${sensor.value}<span class="sensor-card-unit">${sensor.unit}</span></div>
+            <div class="sensor-card-average">Среднее за день: ${sensor.average}${sensor.unit}</div>
+            <div class="sensor-card-details">
+              <div class="sensor-card-trend trend-${sensor.trend}">
+                <i class="fas fa-arrow-${sensor.trend === 'stable' ? 'minus' : sensor.trend}"></i>
+                <span>${sensor.trend === 'up' ? '+' : ''}${sensor.change}${sensor.unit}</span>
+              </div>
+              <div>Обновлено: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+            </div>
+            <div class="sensor-card-history">
+              <svg class="history-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+                <path d="${getHistoryPath(sensor.trend)}"></path>
+              </svg>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Обновляем уведомления
+      const alertsContainer = document.getElementById('alertsContainer');
+      alertsContainer.innerHTML = location.alerts.map(alert => `
+        <div class="alert-item">
+          <div class="alert-icon alert-${alert.type}">
+            <i class="fas fa-${getAlertIcon(alert.type)}"></i>
+          </div>
+          <div class="alert-content">
+            <h4>${alert.title}</h4>
+            <p>${alert.message}</p>
+          </div>
+          <div class="alert-time">${alert.time}</div>
+        </div>
+      `).join('');
+      
+      // Обновляем графики
+      updateCharts(locationId);
+    }
+
+    // Функция для получения текста статуса
+    function getStatusText(status) {
+      const statusTexts = {
+        normal: "Норма",
+        warning: "Выше нормы",
+        danger: "Критично"
+      };
+      return statusTexts[status] || "Неизвестно";
+    }
+
+    // Функция для получения пути графика истории
+    function getHistoryPath(trend) {
+      const paths = {
+        up: "M0,40 L20,35 L40,30 L60,25 L80,20 L100,15",
+        down: "M0,15 L20,20 L40,25 L60,30 L80,35 L100,40",
+        stable: "M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"
+      };
+      return paths[trend] || paths.stable;
+    }
+
+    // Функция для получения иконки уведомления
+    function getAlertIcon(type) {
+      const icons = {
+        danger: "exclamation-triangle",
+        warning: "exclamation-circle",
+        info: "info-circle"
+      };
+      return icons[type] || "info-circle";
+    }
+
+    // Функция для обновления графиков
+    function updateCharts(locationId) {
+      // Уничтожаем предыдущие графики
+      currentCharts.forEach(chart => chart.destroy());
+      currentCharts = [];
+      
+      const location = locationData[locationId];
+      
+      if (location.sensorData.length === 0) return;
+      
       // График температуры и влажности
       const tempHumidityCtx = document.getElementById('tempHumidityChart').getContext('2d');
-      new Chart(tempHumidityCtx, {
+      const tempHumidityChart = new Chart(tempHumidityCtx, {
         type: 'line',
         data: {
           labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
           datasets: [
             {
               label: 'Температура (°C)',
-              data: [19.2, 18.5, 19.8, 21.5, 22.8, 23.2, 21.5, 20.1],
+              data: generateChartData(location.sensorData.find(s => s.type === 'temperature')?.value || 22, 2),
               borderColor: '#e74c3c',
               backgroundColor: 'rgba(231, 76, 60, 0.1)',
               tension: 0.4,
@@ -1056,7 +1115,7 @@
             },
             {
               label: 'Влажность (%)',
-              data: [52, 55, 48, 42, 38, 40, 45, 50],
+              data: generateChartData(location.sensorData.find(s => s.type === 'humidity')?.value || 45, 5),
               borderColor: '#3498db',
               backgroundColor: 'rgba(52, 152, 219, 0.1)',
               tension: 0.4,
@@ -1092,17 +1151,18 @@
           }
         }
       });
-
+      currentCharts.push(tempHumidityChart);
+      
       // График качества воздуха
       const airQualityCtx = document.getElementById('airQualityChart').getContext('2d');
-      new Chart(airQualityCtx, {
+      const airQualityChart = new Chart(airQualityCtx, {
         type: 'line',
         data: {
           labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
           datasets: [
             {
               label: 'CO₂ (ppm)',
-              data: [650, 620, 580, 610, 720, 780, 850, 800],
+              data: generateChartData(location.sensorData.find(s => s.type === 'co2')?.value || 650, 50),
               borderColor: '#9b59b6',
               backgroundColor: 'rgba(155, 89, 182, 0.1)',
               tension: 0.4,
@@ -1110,7 +1170,7 @@
             },
             {
               label: 'PM2.5 (µg/m³)',
-              data: [18, 16, 14, 12, 10, 11, 13, 15],
+              data: generateChartData(location.sensorData.find(s => s.type === 'pm')?.value || 12, 3),
               borderColor: '#f39c12',
               backgroundColor: 'rgba(243, 156, 18, 0.1)',
               tension: 0.4,
@@ -1146,147 +1206,43 @@
           }
         }
       });
+      currentCharts.push(airQualityChart);
+    }
 
-      // График загрязняющих веществ
-      const pollutantsCtx = document.getElementById('pollutantsChart').getContext('2d');
-      new Chart(pollutantsCtx, {
-        type: 'bar',
-        data: {
-          labels: ['ЛОС', 'Амиак', 'NOₓ', 'Бензол'],
-          datasets: [{
-            label: 'Концентрация',
-            data: [350, 0.8, 45, 2.5],
-            backgroundColor: [
-              'rgba(231, 76, 60, 0.7)',
-              'rgba(52, 152, 219, 0.7)',
-              'rgba(243, 156, 18, 0.7)',
-              'rgba(46, 204, 113, 0.7)'
-            ],
-            borderColor: [
-              'rgb(231, 76, 60)',
-              'rgb(52, 152, 219)',
-              'rgb(243, 156, 18)',
-              'rgb(46, 204, 113)'
-            ],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-
-      // График давления и УФ-индекса
-      const pressureUvCtx = document.getElementById('pressureUvChart').getContext('2d');
-      new Chart(pressureUvCtx, {
-        type: 'line',
-        data: {
-          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
-          datasets: [
-            {
-              label: 'Давление (hPa)',
-              data: [1010, 1011, 1012, 1013, 1013, 1012, 1011, 1010],
-              borderColor: '#34495e',
-              backgroundColor: 'rgba(52, 73, 94, 0.1)',
-              tension: 0.4,
-              yAxisID: 'y'
-            },
-            {
-              label: 'УФ-индекс',
-              data: [0, 0, 1.2, 2.8, 3.5, 2.2, 0.8, 0],
-              borderColor: '#f1c40f',
-              backgroundColor: 'rgba(241, 196, 15, 0.1)',
-              tension: 0.4,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              type: 'linear',
-              display: true,
-              position: 'left',
-              title: {
-                display: true,
-                text: 'Давление (hPa)'
-              }
-            },
-            y1: {
-              type: 'linear',
-              display: true,
-              position: 'right',
-              title: {
-                display: true,
-                text: 'УФ-индекс'
-              },
-              grid: {
-                drawOnChartArea: false
-              }
-            }
-          }
-        }
+    // Функция для генерации данных графика на основе текущего значения
+    function generateChartData(baseValue, variation) {
+      return Array.from({length: 8}, (_, i) => {
+        const randomVariation = (Math.random() - 0.5) * 2 * variation;
+        return Math.max(0, baseValue + randomVariation);
       });
     }
 
-    // Инициализация графиков после загрузки страницы
-    document.addEventListener('DOMContentLoaded', initCharts);
+    // Обработчик выбора местоположения
+    document.querySelectorAll('.location-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Убираем активный класс у всех опций
+        document.querySelectorAll('.location-option').forEach(opt => {
+          opt.classList.remove('active');
+        });
+        
+        // Добавляем активный класс к выбранной опции
+        this.classList.add('active');
+        
+        // Показываем данные для выбранного местоположения
+        const locationId = this.getAttribute('data-location');
+        showLocationData(locationId);
+      });
+    });
+
+    // Инициализация с данными для офиса по умолчанию
+    document.addEventListener('DOMContentLoaded', () => {
+      showLocationData('office');
+    });
 
     // Имитация обновления данных
     function updateSensorData() {
-      const sensors = document.querySelectorAll('.sensor-card');
-      
-      sensors.forEach(sensor => {
-        const valueElement = sensor.querySelector('.sensor-value');
-        const timeElement = sensor.querySelector('.sensor-details div:last-child');
-        const trendElement = sensor.querySelector('.sensor-trend span');
-        const averageElement = sensor.querySelector('.sensor-average');
-        
-        // Текущее время
-        const now = new Date();
-        const timeString = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
-        timeElement.textContent = 'Обновлено: ' + timeString;
-        
-        // Случайное изменение значений (в реальном приложении здесь был бы запрос к API)
-        const currentValue = parseFloat(valueElement.textContent);
-        const change = (Math.random() - 0.5) * 2; // от -1 до 1
-        const newValue = Math.max(0, currentValue + change);
-        
-        // Обновление значения с округлением
-        const unit = valueElement.querySelector('.sensor-unit').textContent;
-        valueElement.innerHTML = newValue.toFixed(unit === '°C' || unit === '' ? 1 : 0) + '<span class="sensor-unit">' + unit + '</span>';
-        
-        // Обновление среднего значения
-        const currentAvg = parseFloat(averageElement.textContent.split(': ')[1]);
-        const newAvg = (currentAvg + newValue) / 2;
-        averageElement.textContent = 'Среднее за день: ' + newAvg.toFixed(1) + unit;
-        
-        // Обновление тренда
-        const trendIcon = trendElement.parentElement.querySelector('i');
-        const trendValue = trendElement;
-        
-        if (change > 0.1) {
-          trendIcon.className = 'fas fa-arrow-up';
-          trendIcon.parentElement.className = 'sensor-trend trend-up';
-          trendValue.textContent = '+' + change.toFixed(1) + (unit === '°C' ? '°C' : unit);
-        } else if (change < -0.1) {
-          trendIcon.className = 'fas fa-arrow-down';
-          trendIcon.parentElement.className = 'sensor-trend trend-down';
-          trendValue.textContent = change.toFixed(1) + (unit === '°C' ? '°C' : unit);
-        } else {
-          trendIcon.className = 'fas fa-minus';
-          trendIcon.parentElement.className = 'sensor-trend trend-stable';
-          trendValue.textContent = '0' + (unit === '°C' ? '°C' : unit);
-        }
-      });
+      const activeLocation = document.querySelector('.location-option.active').getAttribute('data-location');
+      showLocationData(activeLocation);
     }
 
     // Обновление данных каждые 30 секунд
