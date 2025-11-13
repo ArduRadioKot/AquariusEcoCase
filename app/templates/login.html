@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход | Aquaris x S.I.T</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/logStyle.css') }}">
+</head>
+<body>
+  <a href="/" class="back-link">
+    <i class="fas fa-arrow-left"></i>
+    <span>На главную</span>
+  </a>
+
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="logo">
+        <i class="fas fa-wind"></i>
+        <h1>Aquaris x S.I.T</h1>
+      </div>
+      <p>Войдите в свой аккаунт</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" name="email" required placeholder="your@email.com">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" name="password" required placeholder="Введите пароль">
+      </div>
+
+      <button type="submit" class="auth-button">
+        <i class="fas fa-sign-in-alt"></i> Войти
+      </button>
+    </form>
+
+    <div class="auth-links">
+      <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+    </div>
+  </div>
+</body>
+</html>

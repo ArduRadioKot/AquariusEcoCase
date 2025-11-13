@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP8266 Data Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .data-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .data-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+        }
+        .serial-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f0f8ff;
+            border-left: 4px solid #2196F3;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .device {
+            font-weight: bold;
+            color: #333;
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ESP8266 Data Monitor</h1>
+        
+        <div class="controls">
+            <button onclick="refreshData()">Обновить</button>
+            <button onclick="clearData()">Очистить</button>
+            <button onclick="startAutoRefresh()">Автообновление (10 сек)</button>
+            <button onclick="stopAutoRefresh()">Стоп автообновление</button>
+        </div>
+
+        <div class="data-section">
+            <h2>Данные устройства</h2>
+            <div id="deviceData"></div>
+        </div>
+
+        <div class="data-section">
+            <h2>Serial данные</h2>
+            <div id="serialData"></div>
+        </div>
+    </div>
+
+    <script>
+        let autoRefreshInterval = null;
+
+        function loadData() {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    displayDeviceData(data.device_data);
+                    displaySerialData(data.serial_data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function displayDeviceData(data) {
+            const container = document.getElementById('deviceData');
+            if (data.length === 0) {
+                container.innerHTML = '<div class="data-item">Нет данных</div>';
+                return;
+            }
+
+            container.innerHTML = data.reverse().map(item => `
+                <div class="data-item">
+                    <span class="device">${item.device}</span> - 
+                    <span class="timestamp">${item.timestamp}</span><br>
+                    Статус: ${item.data.status || 'N/A'}, 
+                    Свободная память: ${item.data.free_memory || 'N/A'} bytes
+                </div>
+            `).join('');
+        }
+
+        function displaySerialData(data) {
+            const container = document.getElementById('serialData');
+            if (data.length === 0) {
+                container.innerHTML = '<div class="serial-item">Нет serial данных</div>';
+                return;
+            }
+
+            container.innerHTML = data.reverse().map(item => `
+                <div class="serial-item">
+                    <span class="device">${item.device}</span> - 
+                    <span class="timestamp">${item.timestamp}</span><br>
+                    Данные: ${item.serial_data}
+                </div>
+            `).join('');
+        }
+
+        function refreshData() {
+            loadData();
+        }
+
+        function clearData() {
+            fetch('/api/clear')
+                .then(() => loadData())
+                .catch(error => console.error('Error:', error));
+        }
+
+        function startAutoRefresh() {
+            stopAutoRefresh();
+            autoRefreshInterval = setInterval(loadData, 10000);
+            loadData();
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // Загрузка данных при старте
+        loadData();
+    </script>
+</body>
+</html>
