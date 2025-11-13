@@ -71,6 +71,7 @@
       font-weight: 700;
       background: var(--gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -738,93 +739,16 @@
   <section class="hero" data-aos="fade-up">
     <div class="hero-content">
       <h2>Дэшборд показаний сенсоров</h2>
-      <p>Выберите местоположение датчика для просмотра всех показаний</p>
+      <p>Мониторинг данных с подключенного ESP8266 датчика в реальном времени</p>
     </div>
   </section>
 
   <section class="location-selector" data-aos="fade-up">
-    <h3 class="section-title">Выбор местоположения</h3>
+    <h3 class="section-title">Подключенный датчик</h3>
     <div class="selector-container">
-      <div class="selector-title">Выберите датчик для просмотра показаний</div>
+      <div class="selector-title">ESP8266 Сенсор</div>
       <div class="location-options">
-        <div class="location-option active" data-location="office">
-          <div class="location-header">
-            <div class="location-icon">
-              <i class="fas fa-building"></i>
-            </div>
-            <div class="location-info">
-              <div class="location-name">Офисное здание</div>
-              <div class="location-address">ул. Ленина, 25, этаж 3</div>
-            </div>
-            <div class="location-status">Online</div>
-          </div>
-          <div class="location-sensors">
-            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
-            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
-            <div class="sensor-tag"><i class="fas fa-smog"></i> CO₂</div>
-            <div class="sensor-tag"><i class="fas fa-wind"></i> PM2.5</div>
-          </div>
-        </div>
-
-        <div class="location-option" data-location="production">
-          <div class="location-header">
-            <div class="location-icon">
-              <i class="fas fa-industry"></i>
-            </div>
-            <div class="location-info">
-              <div class="location-name">Производственный цех</div>
-              <div class="location-address">пр. Победы, 104, цех №2</div>
-            </div>
-            <div class="location-status">Online</div>
-          </div>
-          <div class="location-sensors">
-            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
-            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
-            <div class="sensor-tag"><i class="fas fa-flask"></i> ЛОС</div>
-            <div class="sensor-tag"><i class="fas fa-atom"></i> Амиак</div>
-            <div class="sensor-tag"><i class="fas fa-industry"></i> NOₓ</div>
-          </div>
-        </div>
-
-        <div class="location-option" data-location="laboratory">
-          <div class="location-header">
-            <div class="location-icon">
-              <i class="fas fa-flask"></i>
-            </div>
-            <div class="location-info">
-              <div class="location-name">Исследовательская лаборатория</div>
-              <div class="location-address">ул. Академическая, 15, корп. Б</div>
-            </div>
-            <div class="location-status">Online</div>
-          </div>
-          <div class="location-sensors">
-            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
-            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
-            <div class="sensor-tag"><i class="fas fa-weight-hanging"></i> Давление</div>
-            <div class="sensor-tag"><i class="fas fa-vial"></i> Бензол</div>
-            <div class="sensor-tag"><i class="fas fa-flask"></i> ЛОС</div>
-          </div>
-        </div>
-
-        <div class="location-option" data-location="warehouse">
-          <div class="location-header">
-            <div class="location-icon">
-              <i class="fas fa-warehouse"></i>
-            </div>
-            <div class="location-info">
-              <div class="location-name">Складское помещение</div>
-              <div class="location-address">ул. Складская, 7, зона А</div>
-            </div>
-            <div class="location-status status-offline">Offline</div>
-          </div>
-          <div class="location-sensors">
-            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
-            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
-            <div class="sensor-tag"><i class="fas fa-smog"></i> CO₂</div>
-          </div>
-        </div>
-
-        <div class="location-option" data-location="esp01">
+        <div class="location-option active" data-location="esp01">
           <div class="location-header">
             <div class="location-icon">
               <i class="fas fa-wifi"></i>
@@ -833,7 +757,7 @@
               <div class="location-name">ESP8266 Датчик</div>
               <div class="location-address">Подключенный сенсор</div>
             </div>
-            <div class="location-status">Online</div>
+            <div class="location-status" id="sensorStatus">Online</div>
           </div>
           <div class="location-sensors">
             <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
@@ -851,11 +775,11 @@
   <section class="sensor-info" data-aos="fade-up">
     <div class="sensor-header">
       <div class="sensor-image">
-        <i class="fas fa-building"></i>
+        <i class="fas fa-wifi"></i>
       </div>
       <div class="sensor-details">
-        <div class="sensor-title">Офисное здание</div>
-        <div class="sensor-location">ул. Ленина, 25, этаж 3</div>
+        <div class="sensor-title">ESP8266 Датчик</div>
+        <div class="sensor-location">Подключенный сенсор</div>
         <div class="sensor-meta">
           <div class="meta-item">
             <div class="meta-label">Статус</div>
@@ -944,73 +868,6 @@
       offset: 100
     });
 
-    // Данные для разных местоположений
-    const locationData = {
-      office: {
-        name: "Офисное здание",
-        address: "ул. Ленина, 25, этаж 3",
-        status: "Online",
-        sensors: 4,
-        icon: "building",
-        sensorData: [
-          { type: "temperature", name: "Температура", value: 22.5, unit: "°C", average: 21.8, trend: "up", change: 0.3, status: "normal", icon: "thermometer-half" },
-          { type: "humidity", name: "Влажность", value: 45, unit: "%", average: 47.2, trend: "stable", change: 0, status: "normal", icon: "tint" },
-          { type: "co2", name: "CO₂", value: 850, unit: "ppm", average: 720, trend: "up", change: 50, status: "warning", icon: "smog" },
-          { type: "pm", name: "PM2.5", value: 12, unit: "µg/m³", average: 14.5, trend: "down", change: 2, status: "normal", icon: "wind" }
-        ],
-        alerts: [
-          { type: "warning", title: "Повышенный уровень CO₂", message: "Концентрация углекислого газа приближается к верхней границе нормы", time: "12:30" }
-        ]
-      },
-      production: {
-        name: "Производственный цех",
-        address: "пр. Победы, 104, цех №2",
-        status: "Online",
-        sensors: 5,
-        icon: "industry",
-        sensorData: [
-          { type: "temperature", name: "Температура", value: 26.8, unit: "°C", average: 25.2, trend: "up", change: 0.5, status: "warning", icon: "thermometer-half" },
-          { type: "humidity", name: "Влажность", value: 38, unit: "%", average: 40.1, trend: "down", change: 1.2, status: "normal", icon: "tint" },
-          { type: "voc", name: "ЛОС", value: 420, unit: "ppb", average: 380, trend: "up", change: 25, status: "danger", icon: "flask" },
-          { type: "ammonia", name: "Амиак (NH₃)", value: 1.2, unit: "ppm", average: 0.9, trend: "up", change: 0.1, status: "warning", icon: "atom" },
-          { type: "nox", name: "Оксиды азота (NOₓ)", value: 65, unit: "ppb", average: 52, trend: "up", change: 8, status: "danger", icon: "industry" }
-        ],
-        alerts: [
-          { type: "danger", title: "Высокий уровень ЛОС", message: "Уровень летучих органических соединений превысил допустимый предел", time: "12:42" },
-          { type: "danger", title: "Критичный уровень NOₓ", message: "Концентрация оксидов азота достигла опасных значений", time: "12:25" },
-          { type: "warning", title: "Повышенная температура", message: "Температура в цехе превышает комфортные значения", time: "11:50" }
-        ]
-      },
-      laboratory: {
-        name: "Исследовательская лаборатория",
-        address: "ул. Академическая, 15, корп. Б",
-        status: "Online",
-        sensors: 5,
-        icon: "flask",
-        sensorData: [
-          { type: "temperature", name: "Температура", value: 21.2, unit: "°C", average: 21.5, trend: "down", change: 0.2, status: "normal", icon: "thermometer-half" },
-          { type: "humidity", name: "Влажность", value: 52, unit: "%", average: 50.8, trend: "up", change: 1.5, status: "normal", icon: "tint" },
-          { type: "pressure", name: "Давление", value: 1012, unit: "hPa", average: 1011, trend: "stable", change: 0, status: "normal", icon: "weight-hanging" },
-          { type: "benzene", name: "Бензол (C₆H₆)", value: 1.8, unit: "ppb", average: 1.9, trend: "down", change: 0.1, status: "normal", icon: "vial" },
-          { type: "voc", name: "ЛОС", value: 185, unit: "ppb", average: 192, trend: "down", change: 5, status: "normal", icon: "flask" }
-        ],
-        alerts: [
-          { type: "info", title: "Все показатели в норме", message: "Все датчики показывают значения в пределах нормы", time: "12:45" }
-        ]
-      },
-      warehouse: {
-        name: "Складское помещение",
-        address: "ул. Складская, 7, зона А",
-        status: "Offline",
-        sensors: 3,
-        icon: "warehouse",
-        sensorData: [],
-        alerts: [
-          { type: "warning", title: "Датчик offline", message: "Складской датчик не передает данные более 2 часов", time: "10:30" }
-        ]
-      }
-    };
-
     let currentCharts = [];
 
 
@@ -1069,9 +926,9 @@
       });
     });
 
-    // Инициализация с данными для офиса по умолчанию
+    // Инициализация с данными ESP8266 по умолчанию
     document.addEventListener('DOMContentLoaded', () => {
-      showLocationData('office');
+      showLocationData('esp01');
     });
 
     // Функция для получения данных с сервера
@@ -1267,39 +1124,66 @@
       return alerts;
     }
 
-    // Обновленная функция для отображения данных
+    // Функция для отображения данных
     async function showLocationData(locationId) {
-      // Если это реальное устройство, получаем данные с сервера
-      if (locationId === 'esp01' || locationId === 'real-sensor') {
-        const serverData = await fetchSensorData('esp01');
-        if (serverData && serverData.data) {
-          const displayData = convertServerDataToDisplay(serverData);
-          if (displayData) {
-            displaySensorData(displayData);
-            return;
-          }
+      // Получаем данные с сервера
+      const serverData = await fetchSensorData(locationId || 'esp01');
+      if (serverData && serverData.data) {
+        const displayData = convertServerDataToDisplay(serverData);
+        if (displayData) {
+          displaySensorData(displayData);
+          return;
         }
-        // Если данных нет, показываем сообщение
-        const sensorDataContainer = document.getElementById('sensorData');
-        sensorDataContainer.innerHTML = `
-          <div class="no-data">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Данные недоступны</h3>
-            <p>Датчик не подключен или не передает данные</p>
+      }
+      // Если данных нет, показываем сообщение
+      const sensorDataContainer = document.getElementById('sensorData');
+      sensorDataContainer.innerHTML = `
+        <div class="no-data">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Данные недоступны</h3>
+          <p>Датчик не подключен или не передает данные</p>
+        </div>
+      `;
+      
+      // Обновляем заголовок
+      const sensorHeader = document.querySelector('.sensor-header');
+      if (sensorHeader) {
+        sensorHeader.querySelector('.sensor-image i').className = 'fas fa-wifi';
+        sensorHeader.querySelector('.sensor-title').textContent = 'ESP8266 Датчик';
+        sensorHeader.querySelector('.sensor-location').textContent = 'Подключенный сенсор';
+        const metaValues = sensorHeader.querySelectorAll('.meta-value');
+        if (metaValues.length > 0) metaValues[0].textContent = 'Offline';
+        if (metaValues.length > 1) metaValues[1].textContent = '--:--';
+        if (metaValues.length > 2) metaValues[2].textContent = '0';
+      }
+      
+      // Очищаем уведомления
+      const alertsContainer = document.getElementById('alertsContainer');
+      if (alertsContainer) {
+        alertsContainer.innerHTML = `
+          <div class="alert-item">
+            <div class="alert-icon alert-warning">
+              <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+              <h4>Датчик не подключен</h4>
+              <p>Датчик не передает данные. Проверьте подключение.</p>
+            </div>
+            <div class="alert-time">--:--</div>
           </div>
         `;
-        return;
-      }
-
-      // Для остальных местоположений используем статические данные
-      const location = locationData[locationId];
-      if (location) {
-        displaySensorData(location);
       }
     }
-
+      
     // Функция для отображения данных сенсоров
     function displaySensorData(location) {
+      // Обновляем статус в выборе местоположения
+      const statusElement = document.getElementById('sensorStatus');
+      if (statusElement) {
+        statusElement.textContent = location.status;
+        statusElement.className = location.status === 'Online' ? 'location-status' : 'location-status status-offline';
+      }
+      
       // Обновляем заголовок с информацией о датчике
       const sensorHeader = document.querySelector('.sensor-header');
       if (sensorHeader) {
@@ -1354,18 +1238,18 @@
       // Обновляем уведомления
       const alertsContainer = document.getElementById('alertsContainer');
       if (alertsContainer && location.alerts) {
-        alertsContainer.innerHTML = location.alerts.map(alert => `
-          <div class="alert-item">
-            <div class="alert-icon alert-${alert.type}">
-              <i class="fas fa-${getAlertIcon(alert.type)}"></i>
-            </div>
-            <div class="alert-content">
-              <h4>${alert.title}</h4>
-              <p>${alert.message}</p>
-            </div>
-            <div class="alert-time">${alert.time}</div>
+      alertsContainer.innerHTML = location.alerts.map(alert => `
+        <div class="alert-item">
+          <div class="alert-icon alert-${alert.type}">
+            <i class="fas fa-${getAlertIcon(alert.type)}"></i>
           </div>
-        `).join('');
+          <div class="alert-content">
+            <h4>${alert.title}</h4>
+            <p>${alert.message}</p>
+          </div>
+          <div class="alert-time">${alert.time}</div>
+        </div>
+      `).join('');
       }
       
       // Обновляем графики
@@ -1385,59 +1269,59 @@
       const humiditySensor = location.sensorData.find(s => s.type === 'humidity');
       
       if (tempSensor || humiditySensor) {
-        const tempHumidityCtx = document.getElementById('tempHumidityChart').getContext('2d');
-        const tempHumidityChart = new Chart(tempHumidityCtx, {
-          type: 'line',
-          data: {
-            labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
-            datasets: [
-              {
-                label: 'Температура (°C)',
+      const tempHumidityCtx = document.getElementById('tempHumidityChart').getContext('2d');
+      const tempHumidityChart = new Chart(tempHumidityCtx, {
+        type: 'line',
+        data: {
+          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+          datasets: [
+            {
+              label: 'Температура (°C)',
                 data: tempSensor ? generateChartData(tempSensor.value, 2) : [],
-                borderColor: '#e74c3c',
-                backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                tension: 0.4,
-                yAxisID: 'y'
-              },
-              {
-                label: 'Влажность (%)',
+              borderColor: '#e74c3c',
+              backgroundColor: 'rgba(231, 76, 60, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Влажность (%)',
                 data: humiditySensor ? generateChartData(humiditySensor.value, 5) : [],
-                borderColor: '#3498db',
-                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                tension: 0.4,
-                yAxisID: 'y1'
+              borderColor: '#3498db',
+              backgroundColor: 'rgba(52, 152, 219, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Температура (°C)'
               }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                type: 'linear',
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
                 display: true,
-                position: 'left',
-                title: {
-                  display: true,
-                  text: 'Температура (°C)'
-                }
+                text: 'Влажность (%)'
               },
-              y1: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                title: {
-                  display: true,
-                  text: 'Влажность (%)'
-                },
-                grid: {
-                  drawOnChartArea: false
-                }
+              grid: {
+                drawOnChartArea: false
               }
             }
           }
-        });
-        currentCharts.push(tempHumidityChart);
+        }
+      });
+      currentCharts.push(tempHumidityChart);
       }
       
       // График качества воздуха
@@ -1445,60 +1329,60 @@
       const pmSensor = location.sensorData.find(s => s.type === 'pm');
       
       if (co2Sensor || pmSensor) {
-        const airQualityCtx = document.getElementById('airQualityChart').getContext('2d');
-        const airQualityChart = new Chart(airQualityCtx, {
-          type: 'line',
-          data: {
-            labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
-            datasets: [
-              {
-                label: 'CO₂ (ppm)',
+      const airQualityCtx = document.getElementById('airQualityChart').getContext('2d');
+      const airQualityChart = new Chart(airQualityCtx, {
+        type: 'line',
+        data: {
+          labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+          datasets: [
+            {
+              label: 'CO₂ (ppm)',
                 data: co2Sensor ? generateChartData(co2Sensor.value, 50) : [],
-                borderColor: '#9b59b6',
-                backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                tension: 0.4,
-                yAxisID: 'y'
-              },
-              {
-                label: 'PM2.5 (µg/m³)',
+              borderColor: '#9b59b6',
+              backgroundColor: 'rgba(155, 89, 182, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'PM2.5 (µg/m³)',
                 data: pmSensor ? generateChartData(pmSensor.value, 3) : [],
-                borderColor: '#f39c12',
-                backgroundColor: 'rgba(243, 156, 18, 0.1)',
-                tension: 0.4,
-                yAxisID: 'y1'
+              borderColor: '#f39c12',
+              backgroundColor: 'rgba(243, 156, 18, 0.1)',
+              tension: 0.4,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              title: {
+                display: true,
+                text: 'CO₂ (ppm)'
               }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                type: 'linear',
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              title: {
                 display: true,
-                position: 'left',
-                title: {
-                  display: true,
-                  text: 'CO₂ (ppm)'
-                }
+                text: 'PM2.5 (µg/m³)'
               },
-              y1: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                title: {
-                  display: true,
-                  text: 'PM2.5 (µg/m³)'
-                },
-                grid: {
-                  drawOnChartArea: false
-                }
+              grid: {
+                drawOnChartArea: false
               }
             }
           }
-        });
-        currentCharts.push(airQualityChart);
-      }
+        }
+      });
+      currentCharts.push(airQualityChart);
+    }
     }
 
     // Имитация обновления данных
