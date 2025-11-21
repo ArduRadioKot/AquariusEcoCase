@@ -7,11 +7,10 @@ import threading
 import json
 from collections import deque
 
-# Путь к базе данных
+
 DB_PATH = 'users.db'
 
 def init_db():
-    """Создаёт таблицу users, если её нет"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
@@ -28,11 +27,11 @@ def init_db():
 app = Flask(__name__)
 app.secret_key = 'dev-secret-key-change-in-production'
 
-# Инициализируем базу данных при старте
+
 init_db()
 
 # Хранилище данных сенсоров
-sensor_data_history = deque(maxlen=1000)  # последние 1000 записей
+sensor_data_history = deque(maxlen=1000)  
 
 class SensorDataStore:
     def __init__(self):
@@ -73,7 +72,6 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Если пользователь уже авторизован, перенаправляем на dashboard
         if 'user_id' in session:
             return redirect(url_for('dashboard'))
         email = request.form.get('email', '').strip()
@@ -208,7 +206,6 @@ def receive_data():
 # API для получения данных сенсоров
 @app.route('/api/sensor-data')
 def get_sensor_data():
-    # Проверка авторизации
     if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
@@ -220,7 +217,6 @@ def get_sensor_data():
     elif device:
         return jsonify({'error': 'Device not found'}), 404
     else:
-        # Возвращаем все данные
         return jsonify({
             'devices': sensor_store.get_latest_data(),
             'history': sensor_store.get_all_data()[-100:]  # последние 100 записей
