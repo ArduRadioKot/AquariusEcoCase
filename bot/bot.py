@@ -1,10 +1,10 @@
 import telebot
 
-bot = telebot.TeleBot('токен')
+bot = telebot.TeleBot('')
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    if message.text == "/command1":
+    if message.text == "/refresh":
         temp = 22.7  # Температура (°C)
         humidity = 44  # Влажность (%)
         pressure_hpa = 1010  # Давление (ГПа)
