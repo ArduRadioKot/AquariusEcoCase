@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 <body>
@@ -97,35 +99,100 @@
     <div class="charts-grid">
       <div class="chart-container">
         <div class="chart-header">
-          <div class="chart-title">Температура и влажность</div>
+          <div class="chart-title">График 1</div>
+          <div class="chart-controls">
+            <select id="chart1Sensor1" class="chart-select">
+              <option value="temperature">Температура</option>
+              <option value="humidity">Влажность</option>
+              <option value="co2">CO₂</option>
+              <option value="pm">PM2.5</option>
+              <option value="pressure">Давление</option>
+              <option value="voc">ЛОС</option>
+            </select>
+            <span class="chart-select-separator">и</span>
+            <select id="chart1Sensor2" class="chart-select">
+              <option value="humidity">Влажность</option>
+              <option value="temperature">Температура</option>
+              <option value="co2">CO₂</option>
+              <option value="pm">PM2.5</option>
+              <option value="pressure">Давление</option>
+              <option value="voc">ЛОС</option>
+            </select>
+          </div>
           <div class="chart-actions">
-            <button class="chart-action"><i class="fas fa-expand"></i></button>
-            <button class="chart-action"><i class="fas fa-download"></i></button>
+            <button class="chart-action" onclick="resetZoom('tempHumidityChart')" title="Сбросить масштаб"><i class="fas fa-home"></i></button>
+            <button class="chart-action" onclick="downloadChart('tempHumidityChart')" title="Скачать"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+        <div class="chart-stats" id="chart1Stats" style="display: none;">
+          <div class="stat-item">
+            <span class="stat-label">Макс:</span>
+            <span class="stat-value" id="chart1Max">-</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Мин:</span>
+            <span class="stat-value" id="chart1Min">-</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Среднее:</span>
+            <span class="stat-value" id="chart1Avg">-</span>
           </div>
         </div>
         <div class="chart-canvas-container">
           <canvas id="tempHumidityChart"></canvas>
         </div>
+        <div class="chart-hint">
+          <i class="fas fa-info-circle"></i> Зажмите левую кнопку мыши и выделите область для анализа
+        </div>
       </div>
       <div class="chart-container">
         <div class="chart-header">
-          <div class="chart-title">Качество воздуха</div>
+          <div class="chart-title">График 2</div>
+          <div class="chart-controls">
+            <select id="chart2Sensor1" class="chart-select">
+              <option value="co2">CO₂</option>
+              <option value="pm">PM2.5</option>
+              <option value="temperature">Температура</option>
+              <option value="humidity">Влажность</option>
+              <option value="pressure">Давление</option>
+              <option value="voc">ЛОС</option>
+            </select>
+            <span class="chart-select-separator">и</span>
+            <select id="chart2Sensor2" class="chart-select">
+              <option value="pm">PM2.5</option>
+              <option value="co2">CO₂</option>
+              <option value="temperature">Температура</option>
+              <option value="humidity">Влажность</option>
+              <option value="pressure">Давление</option>
+              <option value="voc">ЛОС</option>
+            </select>
+          </div>
           <div class="chart-actions">
-            <button class="chart-action"><i class="fas fa-expand"></i></button>
-            <button class="chart-action"><i class="fas fa-download"></i></button>
+            <button class="chart-action" onclick="resetZoom('airQualityChart')" title="Сбросить масштаб"><i class="fas fa-home"></i></button>
+            <button class="chart-action" onclick="downloadChart('airQualityChart')" title="Скачать"><i class="fas fa-download"></i></button>
+          </div>
+        </div>
+        <div class="chart-stats" id="chart2Stats" style="display: none;">
+          <div class="stat-item">
+            <span class="stat-label">Макс:</span>
+            <span class="stat-value" id="chart2Max">-</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Мин:</span>
+            <span class="stat-value" id="chart2Min">-</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Среднее:</span>
+            <span class="stat-value" id="chart2Avg">-</span>
           </div>
         </div>
         <div class="chart-canvas-container">
           <canvas id="airQualityChart"></canvas>
         </div>
+        <div class="chart-hint">
+          <i class="fas fa-info-circle"></i> Зажмите левую кнопку мыши и выделите область для анализа
+        </div>
       </div>
-    </div>
-  </section>
-
-  <section class="alerts" data-aos="fade-up">
-    <h3 class="section-title">Последние уведомления</h3>
-    <div class="alerts-container" id="alertsContainer">
-      <!-- Уведомления будут заполняться динамически -->
     </div>
   </section>
 
