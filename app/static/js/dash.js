@@ -399,8 +399,8 @@ AOS.init({
           },
           tooltip: {
             enabled: true
-          }
-        },
+            }
+          },
         scales: {
           x: {
             type: 'category',

@@ -203,7 +203,7 @@ def receive_data():
         print(f"Error processing sensor data: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 400
 
-# API для получения данных сенсоров
+# API для получения данных сенсоров (требует авторизации)
 @app.route('/api/sensor-data')
 def get_sensor_data():
     if 'user_id' not in session:
@@ -221,6 +221,20 @@ def get_sensor_data():
             'devices': sensor_store.get_latest_data(),
             'history': sensor_store.get_all_data()[-100:]  # последние 100 записей
         })
+
+# Публичный API для мобильного приложения (без авторизации)
+@app.route('/api/mobile/sensor-data')
+def get_mobile_sensor_data():
+    device = request.args.get('device', 'esp01')
+    latest_data = sensor_store.get_latest_data(device)
+    
+    if latest_data:
+        return jsonify(latest_data)
+    else:
+        return jsonify({
+            'error': 'Device not found',
+            'device': device
+        }), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002, debug=True)
