@@ -23,16 +23,6 @@ AOS.init({
   };
 
 
-  // Функция для получения текста статуса
-  function getStatusText(status) {
-    const statusTexts = {
-      normal: "Норма",
-      warning: "Выше нормы",
-      danger: "Критично"
-    };
-    return statusTexts[status] || "Неизвестно";
-  }
-
   // Функция для получения пути графика истории
   function getHistoryPath(trend) {
     const paths = {
@@ -41,16 +31,6 @@ AOS.init({
       stable: "M0,30 L20,25 L40,30 L60,25 L80,30 L100,25"
     };
     return paths[trend] || paths.stable;
-  }
-
-  // Функция для получения иконки уведомления
-  function getAlertIcon(type) {
-    const icons = {
-      danger: "exclamation-triangle",
-      warning: "exclamation-circle",
-      info: "info-circle"
-    };
-    return icons[type] || "info-circle";
   }
 
   // Функция для генерации данных графика на основе текущего значения
@@ -240,40 +220,8 @@ AOS.init({
       status: data.status || 'Online',
       sensors: sensorData.length,
       icon: 'wifi',
-      sensorData: sensorData,
-      alerts: generateAlerts(sensorData)
+      sensorData: sensorData
     };
-  }
-
-  // Генерация уведомлений на основе данных
-  function generateAlerts(sensorData) {
-    const alerts = [];
-    sensorData.forEach(sensor => {
-      if (sensor.status === 'danger') {
-        alerts.push({
-          type: 'danger',
-          title: `Критичный уровень ${sensor.name}`,
-          message: `Значение ${sensor.value}${sensor.unit} превышает допустимый предел`,
-          time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-        });
-      } else if (sensor.status === 'warning') {
-        alerts.push({
-          type: 'warning',
-          title: `Повышенный уровень ${sensor.name}`,
-          message: `Значение ${sensor.value}${sensor.unit} приближается к верхней границе нормы`,
-          time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-        });
-      }
-    });
-    if (alerts.length === 0) {
-      alerts.push({
-        type: 'info',
-        title: 'Все показатели в норме',
-        message: 'Все датчики показывают значения в пределах нормы',
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-      });
-    }
-    return alerts;
   }
 
   // Функция для отображения данных
@@ -309,22 +257,6 @@ AOS.init({
       if (metaValues.length > 2) metaValues[2].textContent = '0';
     }
     
-    // Очищаем уведомления
-    const alertsContainer = document.getElementById('alertsContainer');
-    if (alertsContainer) {
-      alertsContainer.innerHTML = `
-        <div class="alert-item">
-          <div class="alert-icon alert-warning">
-            <i class="fas fa-exclamation-circle"></i>
-          </div>
-          <div class="alert-content">
-            <h4>Датчик не подключен</h4>
-            <p>Датчик не передает данные. Проверьте подключение.</p>
-          </div>
-          <div class="alert-time">--:--</div>
-        </div>
-      `;
-    }
   }
     
   // Функция для отображения данных сенсоров
@@ -366,7 +298,6 @@ AOS.init({
             <div class="sensor-card-icon">
               <i class="fas fa-${sensor.icon}"></i>
             </div>
-            <div class="sensor-card-status status-${sensor.status}">${getStatusText(sensor.status)}</div>
           </div>
           <div class="sensor-card-title">${sensor.name}</div>
           <div class="sensor-card-value">${sensor.value}<span class="sensor-card-unit">${sensor.unit}</span></div>
@@ -383,23 +314,6 @@ AOS.init({
               <path d="${getHistoryPath(sensor.trend)}"></path>
             </svg>
           </div>
-        </div>
-      `).join('');
-    }
-    
-    // Обновляем уведомления
-    const alertsContainer = document.getElementById('alertsContainer');
-    if (alertsContainer && location.alerts) {
-    alertsContainer.innerHTML = location.alerts.map(alert => `
-      <div class="alert-item">
-        <div class="alert-icon alert-${alert.type}">
-          <i class="fas fa-${getAlertIcon(alert.type)}"></i>
-        </div>
-        <div class="alert-content">
-          <h4>${alert.title}</h4>
-          <p>${alert.message}</p>
-        </div>
-        <div class="alert-time">${alert.time}</div>
       </div>
     `).join('');
     }
