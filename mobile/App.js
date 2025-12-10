@@ -28,7 +28,7 @@ export default function App() {
           <Stack.Screen 
             name="Dashboard" 
             component={DashboardScreen}
-            options={{ title: 'AquariusEcoCase' }}
+            options={{ title: 'EcoTest' }}
           />
           <Stack.Screen 
             name="SensorDetail" 

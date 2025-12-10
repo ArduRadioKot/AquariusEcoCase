@@ -8,13 +8,32 @@ import { API_ENDPOINTS } from '../config/api';
  */
 export const getSensorData = async (device = 'esp01') => {
   try {
-    const response = await axios.get(API_ENDPOINTS.SENSOR_DATA, {
-      params: { device },
+    const url = `${API_ENDPOINTS.SENSOR_DATA}?device=${device}`;
+    console.log('Fetching sensor data from:', url);
+    
+    const response = await axios.get(url, {
       timeout: 10000,
+      headers: {
+        'Accept': 'application/json',
+      },
     });
+    
+    console.log('Sensor data response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching sensor data:', error);
+    if (error.response) {
+      // Сервер ответил с кодом ошибки
+      console.error('Error response status:', error.response.status);
+      console.error('Error response data:', error.response.data);
+      console.error('Error response headers:', error.response.headers);
+    } else if (error.request) {
+      // Запрос был отправлен, но ответа не получено
+      console.error('No response received:', error.request);
+    } else {
+      // Ошибка при настройке запроса
+      console.error('Error setting up request:', error.message);
+    }
+    console.error('Full error:', error);
     throw error;
   }
 };
@@ -25,11 +44,32 @@ export const getSensorData = async (device = 'esp01') => {
  * @returns {Array} Массив данных сенсоров
  */
 export const formatSensorData = (serverData) => {
-  if (!serverData || !serverData.data) {
+  console.log('Formatting sensor data:', serverData);
+  
+  if (!serverData) {
+    console.warn('No server data provided');
+    return [];
+  }
+  
+  // Проверяем разные возможные форматы ответа
+  let data = null;
+  if (serverData.data) {
+    // Формат: { timestamp: "...", data: { ... } }
+    data = serverData.data;
+  } else if (serverData.sensor_data) {
+    // Альтернативный формат
+    data = serverData.sensor_data;
+  } else if (typeof serverData === 'object' && !serverData.timestamp) {
+    // Прямой формат данных
+    data = serverData;
+  }
+  
+  if (!data) {
+    console.warn('No sensor data found in response:', serverData);
     return [];
   }
 
-  const data = serverData.data;
+  console.log('Processing sensor data:', data);
   const sensors = [];
 
   if (data.temperature) {

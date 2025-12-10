@@ -21,13 +21,37 @@ const DashboardScreen = ({ navigation }) => {
   const loadSensorData = useCallback(async () => {
     try {
       setError(null);
+      console.log('Loading sensor data...');
       const data = await getSensorData('esp01');
+      console.log('Received data:', data);
       const formattedSensors = formatSensorData(data);
-      setSensors(formattedSensors);
-      setLastUpdate(new Date());
+      console.log('Formatted sensors:', formattedSensors);
+      
+      if (formattedSensors.length === 0) {
+        setError('Данные сенсоров пока не получены. Убедитесь, что ESP8266 отправляет данные на сервер.');
+      } else {
+        setSensors(formattedSensors);
+        setLastUpdate(new Date());
+      }
     } catch (err) {
       console.error('Failed to load sensor data:', err);
-      setError('Не удалось загрузить данные. Проверьте подключение к серверу.');
+      let errorMessage = 'Не удалось загрузить данные. ';
+      
+      if (err.response) {
+        if (err.response.status === 404) {
+          errorMessage += 'Устройство не найдено или данные еще не получены.';
+        } else if (err.response.status === 500) {
+          errorMessage += 'Ошибка на сервере.';
+        } else {
+          errorMessage += `Ошибка сервера: ${err.response.status}.`;
+        }
+      } else if (err.request) {
+        errorMessage += 'Сервер недоступен. Проверьте подключение к интернету и адрес сервера.';
+      } else {
+        errorMessage += err.message || 'Неизвестная ошибка.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
       setRefreshing(false);

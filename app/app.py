@@ -7,6 +7,18 @@ import threading
 import json
 from collections import deque
 
+# Импорт для Telegram бота
+import sys
+# Добавляем путь к корневой папке проекта для импорта
+project_root = os.path.join(os.path.dirname(__file__), '..')
+sys.path.insert(0, project_root)
+try:
+    from bot.bot import init_bot
+    TELEBOT_AVAILABLE = True
+except ImportError as e:
+    TELEBOT_AVAILABLE = False
+    print(f"Warning: Cannot import bot module: {e}. Bot functionality will be disabled.")
+
 
 DB_PATH = 'users.db'
 
@@ -82,20 +94,20 @@ def login():
             return render_template('login.html')
 
         try:
-            conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH)
             conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
-            user = cursor.fetchone()
-            conn.close()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        user = cursor.fetchone()
+        conn.close()
 
-            if user and check_password_hash(user['password_hash'], password):
-                session['user_id'] = user['id']
-                session['username'] = user['username']
-                flash('Вы успешно вошли!', 'success')
+        if user and check_password_hash(user['password_hash'], password):
+            session['user_id'] = user['id']
+            session['username'] = user['username']
+            flash('Вы успешно вошли!', 'success')
                 return redirect(url_for('dashboard'))
-            else:
-                flash('Неверный email или пароль', 'error')
+        else:
+            flash('Неверный email или пароль', 'error')
         except Exception as e:
             flash('Произошла ошибка при входе. Попробуйте позже.', 'error')
     
@@ -231,10 +243,26 @@ def get_mobile_sensor_data():
     if latest_data:
         return jsonify(latest_data)
     else:
+        # Возвращаем пустую структуру вместо 404, чтобы клиент мог обработать отсутствие данных
         return jsonify({
-            'error': 'Device not found',
-            'device': device
-        }), 404
+            'device': device,
+            'timestamp': None,
+            'data': {}
+        })
+
+# Функция для запуска Telegram бота
+def init_telegram_bot():
+    """Инициализация и запуск Telegram бота в отдельном потоке"""
+    if not TELEBOT_AVAILABLE:
+        print("Telegram bot is not available")
+        return
+    
+    # Передаем sensor_store в функцию инициализации бота
+    init_bot(sensor_store)
 
 if __name__ == '__main__':
+    # Запускаем Telegram бота
+    init_telegram_bot()
+    
+    # Запускаем Flask приложение
     app.run(host='0.0.0.0', port=5002, debug=True)

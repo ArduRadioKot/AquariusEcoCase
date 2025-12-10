@@ -1,13 +1,12 @@
 {
   "expo": {
-    "name": "AquariusEcoCase",
-    "slug": "AquariusEcoCase",
+    "name": "EcoTest",
+    "slug": "ecotest",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#30AC97"
     },
@@ -16,14 +15,25 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.aquariuseccase.app"
+      "bundleIdentifier": "com.ecotest.app",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./icon.png",
         "backgroundColor": "#30AC97"
       },
-      "package": "com.aquariuseccase.app"
+      "package": "com.ecotest.app",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7749a596-3ba1-436e-92fd-1d9376c4fe20"
+      }
     }
   }
 }
