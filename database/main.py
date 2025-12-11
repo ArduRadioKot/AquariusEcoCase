@@ -4,7 +4,7 @@ import csv
 
 class DB:
     def __init__(self):
-        self.connection = sqlite3.connect('mea.sqlite')
+        self.connection = sqlite3.connect('measurments.db')
         self.cursor = self.connection.cursor()
 
     def get(self, dat: str):
