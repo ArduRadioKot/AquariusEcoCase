@@ -7,6 +7,18 @@ import threading
 import json
 from collections import deque
 
+# Импорт для Telegram бота
+import sys
+# Добавляем путь к корневой папке проекта для импорта
+project_root = os.path.join(os.path.dirname(__file__), '..')
+sys.path.insert(0, project_root)
+try:
+    from bot.bot import init_bot
+    TELEBOT_AVAILABLE = True
+except ImportError as e:
+    TELEBOT_AVAILABLE = False
+    print(f"Warning: Cannot import bot module: {e}. Bot functionality will be disabled.")
+
 
 DB_PATH = 'users.db'
 
@@ -174,25 +186,64 @@ def logout():
 def receive_data():
     try:
         device = request.form.get('device', 'unknown')
-        # Получаем все данные сенсоров из формы
+        
+        # Получаем ВСЕ возможные данные сенсоров из формы
+        # Основные данные
         sensor_data = {
+            # AHT21
             'temperature': request.form.get('temperature'),
             'humidity': request.form.get('humidity'),
-            'co2': request.form.get('co2'),
+            
+            # ENS160
+            'aqi': request.form.get('aqi'),
+            'tvoc': request.form.get('tvoc'),
+            'eco2': request.form.get('eco2'),
+            
+            # MQ-135
+            'co': request.form.get('co'),
+            'alcohol': request.form.get('alcohol'),
+            'co2_real': request.form.get('co2_real'),
+            'co2': request.form.get('co2'),  # Альтернативное имя
+            'toluene': request.form.get('toluene'),
+            'ammonia': request.form.get('ammonia'),
+            'nh4': request.form.get('nh4'),  # Альтернативное имя для аммиака
+            'acetone': request.form.get('acetone'),
+            
+            # Dust sensor
+            'dust': request.form.get('dust'),
             'pm25': request.form.get('pm25'),
             'pm10': request.form.get('pm10'),
+            'dust_density': request.form.get('dust_density'),
+            'calc_voltage': request.form.get('calc_voltage'),
+            'raw_value': request.form.get('raw_value'),
+            
+            # UV sensor
+            'uv': request.form.get('uv'),
+            'uv_index': request.form.get('uv_index'),  # Альтернативное имя
+            
+            # Статус и системная информация
+            'status': request.form.get('status', 'online'),
+            'free_memory': request.form.get('free_memory', ''),
+            
+            # Дополнительные поля из старой версии
             'pressure': request.form.get('pressure'),
             'voc': request.form.get('voc'),
-            'ammonia': request.form.get('ammonia'),
             'nox': request.form.get('nox'),
             'benzene': request.form.get('benzene'),
-            'uv_index': request.form.get('uv_index'),
-            'status': request.form.get('status', 'online'),
-            'free_memory': request.form.get('free_memory', '')
         }
         
         # Удаляем None значения
         sensor_data = {k: v for k, v in sensor_data.items() if v is not None}
+        
+        # Нормализуем некоторые значения
+        if 'nh4' in sensor_data and 'ammonia' not in sensor_data:
+            sensor_data['ammonia'] = sensor_data['nh4']
+        if 'uv' in sensor_data and 'uv_index' not in sensor_data:
+            sensor_data['uv_index'] = sensor_data['uv']
+        if 'co2_real' in sensor_data and 'co2' not in sensor_data:
+            sensor_data['co2'] = sensor_data['co2_real']
+        if 'dust' in sensor_data and 'pm25' not in sensor_data:
+            sensor_data['pm25'] = sensor_data['dust']
         
         sensor_store.add_sensor_data(device, sensor_data)
         
@@ -231,10 +282,26 @@ def get_mobile_sensor_data():
     if latest_data:
         return jsonify(latest_data)
     else:
+        # Возвращаем пустую структуру вместо 404, чтобы клиент мог обработать отсутствие данных
         return jsonify({
-            'error': 'Device not found',
-            'device': device
-        }), 404
+            'device': device,
+            'timestamp': None,
+            'data': {}
+        })
+
+# Функция для запуска Telegram бота
+def init_telegram_bot():
+    """Инициализация и запуск Telegram бота в отдельном потоке"""
+    if not TELEBOT_AVAILABLE:
+        print("Telegram bot is not available")
+        return
+    
+    # Передаем sensor_store в функцию инициализации бота
+    init_bot(sensor_store)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002, debug=True)
+    # Запускаем Telegram бота
+    init_telegram_bot()
+    
+    # Запускаем Flask приложение
+    app.run(host='0.0.0.0', port=8080, debug=True)
