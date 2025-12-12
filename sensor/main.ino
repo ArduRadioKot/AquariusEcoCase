@@ -24,9 +24,42 @@ bool shouldReboot = false;
 unsigned long lastDataSend = 0;
 const unsigned long DATA_INTERVAL = 5000; // 5 секунд
 
-// Настройки сервера - ЗАМЕНИТЕ НА СВОИ
-const char* serverIP = "192.168.0.106"; 
-const int serverPort = 5000;
+// Настройки сервера
+const char* serverIP = "82.202.142.35"; 
+const int serverPort = 8080;
+
+// Структура для хранения данных с датчиков
+struct SensorData {
+  // AHT21
+  float temperature = 0;
+  float humidity = 0;
+  
+  // ENS160
+  int aqi = 0;
+  float tvoc = 0;
+  float eco2 = 0;
+  
+  // MQ-135
+  float co = 0;
+  float alcohol = 0;
+  float co2 = 0;
+  float toluene = 0;
+  float nh4 = 0;
+  float acetone = 0;
+  
+  // Dust sensor
+  float dust = 0;
+  float calcVoltage = 0;
+  float voMeasured = 0;
+  
+  // UV sensor
+  float uv = 0;
+  
+  bool dataValid = false;
+  unsigned long lastUpdate = 0;
+};
+
+SensorData currentData;
 
 // HTML страница для конфигурации
 const char* configPage = R"rawliteral(
@@ -77,6 +110,9 @@ void loop() {
     ESP.restart();
   }
   
+  // Чтение данных из Serial порта (от Arduino)
+  readSerialData();
+  
   if (isConfigured) {
     // Режим клиента - отправка данных
     server.handleClient();
@@ -86,17 +122,6 @@ void loop() {
       if (millis() - lastDataSend > DATA_INTERVAL) {
         sendDataToServer();
         lastDataSend = millis();
-      }
-      
-      // Чтение из Serial и отправка
-      if (Serial.available()) {
-        String data = Serial.readStringUntil('\n');
-        data.trim();
-        if (data.length() > 0) {
-          Serial.print("Received from Serial: ");
-          Serial.println(data);
-          sendSerialData(data);
-        }
       }
     } else {
       // Переподключение при потере соединения
@@ -184,7 +209,128 @@ void connectToWiFi() {
   }
 }
 
+void readSerialData() {
+  static String serialBuffer = "";
+  
+  while (Serial.available()) {
+    char c = Serial.read();
+    
+    if (c == '\n') {
+      // Обработка завершенной строки
+      processSerialData(serialBuffer);
+      serialBuffer = "";
+    } else if (c != '\r') {
+      serialBuffer += c;
+    }
+  }
+}
+
+void processSerialData(String data) {
+  data.trim();
+  
+  if (data.length() == 0) return;
+  
+  // Отладочный вывод
+  Serial.print("Received from Arduino: ");
+  Serial.println(data);
+  
+  if (data == "DATA_START") {
+    // Начало нового пакета данных - сбрасываем флаг
+    currentData.dataValid = false;
+    return;
+  }
+  
+  if (data == "DATA_END") {
+    // Конец пакета данных - помечаем данные как валидные
+    currentData.dataValid = true;
+    currentData.lastUpdate = millis();
+    
+    Serial.println("\n=== Полный пакет данных получен ===");
+    Serial.print("Temperature: "); Serial.print(currentData.temperature); Serial.println("°C");
+    Serial.print("Humidity: "); Serial.print(currentData.humidity); Serial.println("%");
+    Serial.print("CO: "); Serial.print(currentData.co); Serial.println("ppm");
+    Serial.print("NH4: "); Serial.print(currentData.nh4); Serial.println("ppm");
+    Serial.print("CO2: "); Serial.print(currentData.co2); Serial.println("ppm");
+    Serial.print("AQI: "); Serial.println(currentData.aqi);
+    Serial.print("Dust: "); Serial.print(currentData.dust); Serial.println("µg/m³");
+    Serial.print("UV: "); Serial.print(currentData.uv); Serial.println("mW/cm²");
+    Serial.println("===================================\n");
+    return;
+  }
+  
+  if (data == "ENS160:NO_DATA") {
+    // Датчик ENS160 не работает
+    Serial.println("ENS160: нет данных");
+    return;
+  }
+  
+  if (data == "SENSORS_NOT_INITIALIZED") {
+    Serial.println("Датчики не инициализированы на Arduino");
+    return;
+  }
+  
+  // Парсим данные в формате КЛЮЧ:ЗНАЧЕНИЕ
+  int colonIndex = data.indexOf(':');
+  if (colonIndex == -1) return;
+  
+  String key = data.substring(0, colonIndex);
+  String valueStr = data.substring(colonIndex + 1);
+  valueStr.trim();
+  
+  float value = valueStr.toFloat();
+  
+  // Парсим данные по ключам
+  if (key == "TEMP") {
+    currentData.temperature = value;
+  } 
+  else if (key == "HUM") {
+    currentData.humidity = value;
+  }
+  else if (key == "AQI") {
+    currentData.aqi = (int)value;
+  }
+  else if (key == "TVOC") {
+    currentData.tvoc = value;
+  }
+  else if (key == "ECO2") {
+    currentData.eco2 = value;
+  }
+  else if (key == "CO") {
+    currentData.co = value;
+  }
+  else if (key == "ALC") {
+    currentData.alcohol = value;
+  }
+  else if (key == "CO2_MQ") {
+    currentData.co2 = value;
+  }
+  else if (key == "TOL") {
+    currentData.toluene = value;
+  }
+  else if (key == "NH4") {
+    currentData.nh4 = value;
+  }
+  else if (key == "ACE") {
+    currentData.acetone = value;
+  }
+  else if (key == "DUST") {
+    currentData.dust = value;
+  }
+  else if (key == "VOLT") {
+    currentData.calcVoltage = value;
+  }
+  else if (key == "RAW") {
+    currentData.voMeasured = value;
+  }
+  else if (key == "UV") {
+    currentData.uv = value;
+  }
+}
+
 void sendDataToServer() {
+  // Проверяем, есть ли актуальные данные
+  bool hasRecentData = (millis() - currentData.lastUpdate < 10000); // Данные актуальны если получены менее 10 секунд назад
+  
   if (WiFi.status() == WL_CONNECTED) {
     WiFiClient client;
     
@@ -194,34 +340,66 @@ void sendDataToServer() {
     Serial.println(serverPort);
     
     if (client.connect(serverIP, serverPort)) {
-      // Генерация случайных данных сенсоров
-      float temperature = 18.0 + random(0, 150) / 10.0;  // 18-33°C
-      float humidity = 30.0 + random(0, 500) / 10.0;      // 30-80%
-      int co2 = 400 + random(0, 600);                     // 400-1000 ppm
-      int pm25 = random(0, 50);                           // 0-50 µg/m³
-      int pm10 = random(0, 100);                           // 0-100 µg/m³
-      float pressure = 980.0 + random(0, 600) / 10.0;     // 980-1040 hPa
-      int voc = random(0, 500);                            // 0-500 ppb
-      float ammonia = random(0, 30) / 10.0;               // 0-3.0 ppm
-      int nox = random(0, 100);                            // 0-100 ppb
-      float benzene = random(0, 50) / 10.0;                // 0-5.0 ppb
-      int uv_index = random(0, 12);                       // 0-12
-      
       // Формирование POST данных
       String postData = "device=esp01";
-      postData += "&status=online";
+      postData += "&status=" + String(hasRecentData ? "online" : "no_data");
       postData += "&free_memory=" + String(ESP.getFreeHeap());
-      postData += "&temperature=" + String(temperature, 1);
-      postData += "&humidity=" + String(humidity, 1);
-      postData += "&co2=" + String(co2);
-      postData += "&pm25=" + String(pm25);
-      postData += "&pm10=" + String(pm10);
-      postData += "&pressure=" + String(pressure, 1);
-      postData += "&voc=" + String(voc);
-      postData += "&ammonia=" + String(ammonia, 1);
-      postData += "&nox=" + String(nox);
-      postData += "&benzene=" + String(benzene, 1);
-      postData += "&uv_index=" + String(uv_index);
+      
+      if (hasRecentData && currentData.dataValid) {
+        // AHT21 данные
+        postData += "&temperature=" + String(currentData.temperature, 1);
+        postData += "&humidity=" + String(currentData.humidity, 1);
+        
+        // ENS160 данные
+        postData += "&aqi=" + String(currentData.aqi);
+        postData += "&tvoc=" + String(currentData.tvoc, 0);
+        postData += "&eco2=" + String(currentData.eco2, 0);
+        
+        // MQ-135 данные
+        postData += "&co=" + String(currentData.co, 2);
+        postData += "&alcohol=" + String(currentData.alcohol, 2);
+        postData += "&co2_real=" + String(currentData.co2, 0);
+        postData += "&toluene=" + String(currentData.toluene, 2);
+        postData += "&ammonia=" + String(currentData.nh4, 2);
+        postData += "&acetone=" + String(currentData.acetone, 2);
+        
+        // Dust sensor
+        postData += "&pm25=" + String(currentData.dust, 1);
+        postData += "&pm10=" + String(currentData.dust * 1.5, 1);
+        postData += "&dust_density=" + String(currentData.dust, 1);
+        
+        // UV sensor
+        postData += "&uv_index=" + String(currentData.uv, 1);
+        
+        // Debug info
+        postData += "&calc_voltage=" + String(currentData.calcVoltage, 2);
+        postData += "&raw_value=" + String(currentData.voMeasured, 0);
+        
+        Serial.println("\nОтправляем актуальные данные на сервер:");
+        Serial.print("Temperature: "); Serial.println(currentData.temperature);
+        Serial.print("Humidity: "); Serial.println(currentData.humidity);
+        Serial.print("NH4: "); Serial.println(currentData.nh4);
+        Serial.print("Dust: "); Serial.println(currentData.dust);
+      } else {
+        // Если данных нет - отправляем 0
+        postData += "&temperature=0";
+        postData += "&humidity=0";
+        postData += "&aqi=0";
+        postData += "&tvoc=0";
+        postData += "&eco2=0";
+        postData += "&co=0";
+        postData += "&alcohol=0";
+        postData += "&co2_real=0";
+        postData += "&toluene=0";
+        postData += "&ammonia=0";
+        postData += "&acetone=0";
+        postData += "&pm25=0";
+        postData += "&pm10=0";
+        postData += "&dust_density=0";
+        postData += "&uv_index=0";
+        
+        Serial.println("Нет актуальных данных от датчиков - отправляем 0");
+      }
       
       client.println("POST /data HTTP/1.1");
       client.println("Host: " + String(serverIP) + ":" + String(serverPort));
@@ -240,49 +418,17 @@ void sendDataToServer() {
       }
       
       client.stop();
-      Serial.println("Sensor data sent to server successfully");
-      Serial.print("Temperature: "); Serial.print(temperature); Serial.println("°C");
-      Serial.print("Humidity: "); Serial.print(humidity); Serial.println("%");
-      Serial.print("CO2: "); Serial.print(co2); Serial.println("ppm");
+      
+      if (hasRecentData && currentData.dataValid) {
+        Serial.println("Sensor data sent to server successfully");
+      } else {
+        Serial.println("Zero data sent to server (no sensor data available)");
+      }
     } else {
       Serial.println("Failed to connect to server for data");
     }
-  }
-}
-
-void sendSerialData(String data) {
-  if (WiFi.status() == WL_CONNECTED) {
-    WiFiClient client;
-    
-    Serial.print("Connecting to server for serial data: ");
-    Serial.print(serverIP);
-    Serial.print(":");
-    Serial.println(serverPort);
-    
-    if (client.connect(serverIP, serverPort)) {
-      String postData = "device=esp01&serial_data=" + urlEncode(data);
-      
-      client.println("POST /serial HTTP/1.1");
-      client.println("Host: " + String(serverIP) + ":" + String(serverPort));
-      client.println("Content-Type: application/x-www-form-urlencoded");
-      client.println("Connection: close");
-      client.print("Content-Length: ");
-      client.println(postData.length());
-      client.println();
-      client.println(postData);
-      
-      // Ждем ответа
-      delay(100);
-      while (client.available()) {
-        String line = client.readStringUntil('\r');
-        Serial.print(line);
-      }
-      
-      client.stop();
-      Serial.println("Serial data sent successfully: " + data);
-    } else {
-      Serial.println("Failed to connect to server for serial data");
-    }
+  } else {
+    Serial.println("WiFi not connected - cannot send data");
   }
 }
 

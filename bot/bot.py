@@ -3,6 +3,7 @@ import os
 import threading
 import time
 
+<<<<<<< Updated upstream
 def init_bot(sensor_store, bot_token=None):
     """
     Инициализация и запуск Telegram бота
@@ -28,6 +29,58 @@ def init_bot(sensor_store, bot_token=None):
             "/refresh - получить текущие данные сенсоров\n"
             "/help - показать это сообщение"
         )
+=======
+<<<<<<< Updated upstream
+bot = telebot.TeleBot('токен')
+
+@bot.message_handler(content_types=['text'])
+def get_text_messages(message):
+    if message.text == "/command1":
+        temp = 22.7  # Температура (°C)
+        humidity = 44  # Влажность (%)
+        pressure_hpa = 1010  # Давление (ГПа)
+        pressure_mmhg = round(pressure_hpa * 0.750062)  # Давление (мм рт.ст.)
+        nh3 = 0.03  # Аммиак (ppm)
+        no2 = 0.01  # NO2 (ppm)
+        co2 = 410  # CO2 (ppm)
+
+        msg = (
+            f"Параметры воздуха:\n"
+            f"Температура: {temp}°C\n"
+            f"Влажность: {humidity}%\n"
+            f"Атмосферное давление: {pressure_hpa} ГПа ({pressure_mmhg} мм рт.ст.)\n"
+            f"Аммиак (NH3): {nh3} ppm\n"
+            f"Оксид азота (NO2): {no2} ppm\n"
+            f"Диоксид углерода (CO2): {co2} ppm"
+        )
+        bot.send_message(message.from_user.id, msg)
+    elif message.text == "/help":
+        bot.send_message(message.from_user.id, "Напиши /command1 для измерения параметров воздуха")
+    else:
+        bot.send_message(message.from_user.id, "Я тебя не понимаю. Напиши /help.")
+
+bot.polling(none_stop=True, interval=0)
+=======
+def init_bot(sensor_store, bot_token=None):
+
+    if bot_token is None:
+        bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+    
+    if not bot_token:
+        print("Warning: TELEGRAM_BOT_TOKEN not set. Bot will not start.")
+        return None
+    
+    bot = telebot.TeleBot(bot_token)
+    
+    @bot.message_handler(commands=['start', 'help'])
+    def send_welcome(message):
+        help_text = (
+            "Привет! Я бот для мониторинга параметров воздуха.\n\n"
+            "Доступные команды:\n"
+            "/refresh - получить текущие данные сенсоров\n"
+            "/help - показать это сообщение"
+        )
+>>>>>>> Stashed changes
         bot.reply_to(message, help_text)
     
     @bot.message_handler(commands=['refresh'])
@@ -50,14 +103,22 @@ def init_bot(sensor_store, bot_token=None):
         msg_parts = [f"📊 Параметры воздуха (обновлено: {timestamp})\n"]
         
         if data.get('temperature'):
+<<<<<<< Updated upstream
             msg_parts.append(f"🌡️ Температура: {data['temperature']}°C")
         
         if data.get('humidity'):
             msg_parts.append(f"💧 Влажность: {data['humidity']}%")
+=======
+            msg_parts.append(f"Температура: {data['temperature']}°C")
+        
+        if data.get('humidity'):
+            msg_parts.append(f"Влажность: {data['humidity']}%")
+>>>>>>> Stashed changes
         
         if data.get('pressure'):
             pressure_hpa = float(data['pressure'])
             pressure_mmhg = round(pressure_hpa * 0.750062, 2)
+<<<<<<< Updated upstream
             msg_parts.append(f"📉 Атмосферное давление: {pressure_hpa} ГПа ({pressure_mmhg} мм рт.ст.)")
         
         if data.get('ammonia'):
@@ -83,6 +144,33 @@ def init_bot(sensor_store, bot_token=None):
         
         if data.get('uv_index'):
             msg_parts.append(f"☀️ УФ-индекс: {data['uv_index']}")
+=======
+            msg_parts.append(f"Атмосферное давление: {pressure_hpa} ГПа ({pressure_mmhg} мм рт.ст.)")
+        
+        if data.get('ammonia'):
+            msg_parts.append(f"Аммиак (NH₃): {data['ammonia']} ppm")
+        
+        if data.get('nox'):
+            msg_parts.append(f"Оксиды азота (NOₓ): {data['nox']} ppb")
+        
+        if data.get('co2'):
+            msg_parts.append(f"Диоксид углерода (CO₂): {data['co2']} ppm")
+        
+        if data.get('pm25'):
+            msg_parts.append(f"PM2.5: {data['pm25']} µg/m³")
+        
+        if data.get('pm10'):
+            msg_parts.append(f"PM10: {data['pm10']} µg/m³")
+        
+        if data.get('voc'):
+            msg_parts.append(f"ЛОС (VOC): {data['voc']} ppb")
+        
+        if data.get('benzene'):
+            msg_parts.append(f"Бензол (C₆H₆): {data['benzene']} ppb")
+        
+        if data.get('uv_index'):
+            msg_parts.append(f"УФ-индекс: {data['uv_index']}")
+>>>>>>> Stashed changes
         
         if len(msg_parts) == 1:
             msg_parts.append("Нет доступных данных сенсоров.")
@@ -114,3 +202,7 @@ def init_bot(sensor_store, bot_token=None):
     print("Telegram bot thread started")
     
     return bot
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
