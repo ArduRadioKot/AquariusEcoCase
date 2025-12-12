@@ -304,4 +304,4 @@ if __name__ == '__main__':
     init_telegram_bot()
     
     # Запускаем Flask приложение
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=5002, debug=True)
