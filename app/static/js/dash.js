@@ -86,138 +86,305 @@ AOS.init({
 
     const data = serverData.data;
     const sensorData = [];
+    const randomTrend = () => (Math.random() > 0.5 ? 'up' : 'down');
+    const asFloat = (value) => {
+      const parsed = parseFloat(value);
+      return Number.isNaN(parsed) ? null : parsed;
+    };
+    const asInt = (value) => {
+      const parsed = parseInt(value, 10);
+      return Number.isNaN(parsed) ? null : parsed;
+    };
+
+    const addMetric = ({
+      key,
+      type,
+      name,
+      unit = '',
+      icon = 'gauge',
+      parse = asFloat,
+      average = (v) => v,
+      change = (v) => (Math.random() - 0.5) * (v === 0 ? 1 : v * 0.05),
+      trend = randomTrend,
+      status = () => 'normal',
+      valueOverride
+    }) => {
+      const raw = valueOverride !== undefined ? valueOverride : data[key];
+      if (raw === undefined || raw === null || raw === '') return;
+
+      const numeric = parse(raw);
+      if (numeric === null) return;
+
+      sensorData.push({
+        type: type || key,
+        name,
+        value: numeric,
+        unit,
+        average: average(numeric),
+        trend: trend(numeric),
+        change: change(numeric),
+        status: status(numeric),
+        icon
+      });
+    };
+
+    const co2Value = data.co2 || data.co2_real;
+    const uvValue = data.uv_index || data.uv;
+    const ammoniaValue = data.ammonia || data.nh4;
+    const pm25Value = data.pm25 || data.dust;
 
     // Маппинг данных с сервера на формат для отображения
-    if (data.temperature) {
-      sensorData.push({
-        type: 'temperature',
-        name: 'Температура',
-        value: parseFloat(data.temperature),
-        unit: '°C',
-        average: parseFloat(data.temperature) - 0.5 + Math.random(),
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 0.5,
-        status: parseFloat(data.temperature) > 28 ? 'warning' : 'normal',
-        icon: 'thermometer-half'
-      });
-    }
+    addMetric({
+      key: 'temperature',
+      name: 'Температура',
+      unit: '°C',
+      icon: 'thermometer-half',
+      average: (v) => v - 0.5 + Math.random(),
+      change: () => (Math.random() - 0.5) * 0.5,
+      status: (v) => (v > 28 ? 'warning' : 'normal')
+    });
 
-    if (data.humidity) {
-      sensorData.push({
-        type: 'humidity',
-        name: 'Влажность',
-        value: parseFloat(data.humidity),
-        unit: '%',
-        average: parseFloat(data.humidity) - 2 + Math.random() * 4,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 2,
-        status: parseFloat(data.humidity) < 30 || parseFloat(data.humidity) > 70 ? 'warning' : 'normal',
-        icon: 'tint'
-      });
-    }
+    addMetric({
+      key: 'humidity',
+      name: 'Влажность',
+      unit: '%',
+      icon: 'tint',
+      average: (v) => v - 2 + Math.random() * 4,
+      change: () => (Math.random() - 0.5) * 2,
+      status: (v) => (v < 30 || v > 70 ? 'warning' : 'normal')
+    });
 
-    if (data.co2) {
-      sensorData.push({
-        type: 'co2',
-        name: 'CO₂',
-        value: parseInt(data.co2),
-        unit: 'ppm',
-        average: parseInt(data.co2) - 50 + Math.random() * 100,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 30,
-        status: parseInt(data.co2) > 1000 ? 'danger' : parseInt(data.co2) > 800 ? 'warning' : 'normal',
-        icon: 'smog'
-      });
-    }
+    addMetric({
+      key: 'aqi',
+      name: 'AQI',
+      unit: 'индекс',
+      icon: 'leaf',
+      parse: asInt,
+      average: (v) => v - 2 + Math.random() * 4,
+      change: () => (Math.random() - 0.5) * 5,
+      status: (v) => (v > 100 ? 'danger' : v > 50 ? 'warning' : 'normal')
+    });
 
-    if (data.pm25) {
-      sensorData.push({
-        type: 'pm',
-        name: 'PM2.5',
-        value: parseInt(data.pm25),
-        unit: 'µg/m³',
-        average: parseInt(data.pm25) - 2 + Math.random() * 4,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 2,
-        status: parseInt(data.pm25) > 35 ? 'danger' : parseInt(data.pm25) > 25 ? 'warning' : 'normal',
-        icon: 'wind'
-      });
-    }
+    addMetric({
+      key: 'tvoc',
+      type: 'voc',
+      name: 'TVOC',
+      unit: 'ppb',
+      icon: 'flask',
+      parse: asInt,
+      average: (v) => v - 20 + Math.random() * 40,
+      change: () => (Math.random() - 0.5) * 15,
+      status: (v) => (v > 400 ? 'danger' : v > 300 ? 'warning' : 'normal')
+    });
 
-    if (data.pressure) {
-      sensorData.push({
-        type: 'pressure',
-        name: 'Давление',
-        value: parseFloat(data.pressure),
-        unit: 'hPa',
-        average: parseFloat(data.pressure) - 2 + Math.random() * 4,
-        trend: 'stable',
-        change: 0,
-        status: 'normal',
-        icon: 'weight-hanging'
-      });
-    }
+    addMetric({
+      key: 'voc',
+      name: 'ЛОС',
+      unit: 'ppb',
+      icon: 'flask',
+      parse: asInt,
+      average: (v) => v - 20 + Math.random() * 40,
+      change: () => (Math.random() - 0.5) * 15,
+      status: (v) => (v > 400 ? 'danger' : v > 300 ? 'warning' : 'normal')
+    });
 
-    if (data.voc) {
-      sensorData.push({
-        type: 'voc',
-        name: 'ЛОС',
-        value: parseInt(data.voc),
-        unit: 'ppb',
-        average: parseInt(data.voc) - 20 + Math.random() * 40,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 15,
-        status: parseInt(data.voc) > 400 ? 'danger' : parseInt(data.voc) > 300 ? 'warning' : 'normal',
-        icon: 'flask'
-      });
-    }
+    addMetric({
+      key: 'eco2',
+      type: 'co2',
+      name: 'eCO₂',
+      unit: 'ppm',
+      icon: 'smog',
+      parse: asInt,
+      average: (v) => v - 50 + Math.random() * 100,
+      change: () => (Math.random() - 0.5) * 30,
+      status: (v) => (v > 1000 ? 'danger' : v > 800 ? 'warning' : 'normal')
+    });
 
-    if (data.ammonia) {
-      sensorData.push({
-        type: 'ammonia',
-        name: 'Амиак (NH₃)',
-        value: parseFloat(data.ammonia),
-        unit: 'ppm',
-        average: parseFloat(data.ammonia) - 0.2 + Math.random() * 0.4,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 0.1,
-        status: parseFloat(data.ammonia) > 2 ? 'danger' : parseFloat(data.ammonia) > 1.5 ? 'warning' : 'normal',
-        icon: 'atom'
-      });
-    }
+    addMetric({
+      key: 'co2',
+      type: 'co2',
+      name: 'CO₂',
+      unit: 'ppm',
+      icon: 'smog',
+      parse: asInt,
+      valueOverride: co2Value,
+      average: (v) => v - 50 + Math.random() * 100,
+      change: () => (Math.random() - 0.5) * 30,
+      status: (v) => (v > 1000 ? 'danger' : v > 800 ? 'warning' : 'normal')
+    });
 
-    if (data.nox) {
-      sensorData.push({
-        type: 'nox',
-        name: 'Оксиды азота (NOₓ)',
-        value: parseInt(data.nox),
-        unit: 'ppb',
-        average: parseInt(data.nox) - 5 + Math.random() * 10,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 5,
-        status: parseInt(data.nox) > 80 ? 'danger' : parseInt(data.nox) > 60 ? 'warning' : 'normal',
-        icon: 'industry'
-      });
-    }
+    addMetric({
+      key: 'pm25',
+      type: 'pm25',
+      name: 'PM2.5',
+      unit: 'µg/m³',
+      icon: 'wind',
+      parse: asFloat,
+      valueOverride: pm25Value,
+      average: (v) => v - 2 + Math.random() * 4,
+      change: () => (Math.random() - 0.5) * 2,
+      status: (v) => (v > 35 ? 'danger' : v > 25 ? 'warning' : 'normal')
+    });
 
-    if (data.benzene) {
-      sensorData.push({
-        type: 'benzene',
-        name: 'Бензол (C₆H₆)',
-        value: parseFloat(data.benzene),
-        unit: 'ppb',
-        average: parseFloat(data.benzene) - 0.2 + Math.random() * 0.4,
-        trend: Math.random() > 0.5 ? 'up' : 'down',
-        change: (Math.random() - 0.5) * 0.1,
-        status: parseFloat(data.benzene) > 3 ? 'danger' : parseFloat(data.benzene) > 2 ? 'warning' : 'normal',
-        icon: 'vial'
-      });
-    }
+    addMetric({
+      key: 'pm10',
+      name: 'PM10',
+      unit: 'µg/m³',
+      icon: 'cloud',
+      parse: asFloat,
+      average: (v) => v - 2 + Math.random() * 4,
+      change: () => (Math.random() - 0.5) * 2,
+      status: (v) => (v > 50 ? 'danger' : v > 40 ? 'warning' : 'normal')
+    });
+
+    addMetric({
+      key: 'pressure',
+      name: 'Давление',
+      unit: 'hPa',
+      icon: 'weight-hanging',
+      average: (v) => v - 2 + Math.random() * 4,
+      trend: () => 'stable',
+      change: () => 0,
+      status: () => 'normal'
+    });
+
+    addMetric({
+      key: 'ammonia',
+      name: 'Аммиак (NH₃)',
+      unit: 'ppm',
+      icon: 'atom',
+      valueOverride: ammoniaValue,
+      average: (v) => v - 0.2 + Math.random() * 0.4,
+      change: () => (Math.random() - 0.5) * 0.1,
+      status: (v) => (v > 2 ? 'danger' : v > 1.5 ? 'warning' : 'normal')
+    });
+
+    addMetric({
+      key: 'co',
+      name: 'CO',
+      unit: 'ppm',
+      icon: 'lungs',
+      parse: asFloat,
+      average: (v) => v - 0.2 + Math.random() * 0.4,
+      change: () => (Math.random() - 0.5) * 0.1,
+      status: (v) => (v > 9 ? 'danger' : v > 5 ? 'warning' : 'normal')
+    });
+
+    addMetric({
+      key: 'alcohol',
+      name: 'Алкоголь',
+      unit: 'ppm',
+      icon: 'wine-bottle',
+      parse: asFloat,
+      average: (v) => v - 0.1 + Math.random() * 0.2,
+      change: () => (Math.random() - 0.5) * 0.05,
+      status: () => 'normal'
+    });
+
+    addMetric({
+      key: 'toluene',
+      name: 'Толуол',
+      unit: 'ppm',
+      icon: 'flask',
+      parse: asFloat,
+      average: (v) => v - 0.05 + Math.random() * 0.1,
+      change: () => (Math.random() - 0.5) * 0.05,
+      status: () => 'normal'
+    });
+
+    addMetric({
+      key: 'acetone',
+      name: 'Ацетон',
+      unit: 'ppm',
+      icon: 'vial',
+      parse: asFloat,
+      average: (v) => v - 0.05 + Math.random() * 0.1,
+      change: () => (Math.random() - 0.5) * 0.05,
+      status: () => 'normal'
+    });
+
+    addMetric({
+      key: 'dust_density',
+      name: 'Плотность пыли',
+      unit: 'µg/m³',
+      icon: 'bars-staggered',
+      parse: asFloat,
+      average: (v) => v - 0.1 + Math.random() * 0.2,
+      change: () => (Math.random() - 0.5) * 0.05,
+      status: () => 'normal'
+    });
+
+    addMetric({
+      key: 'calc_voltage',
+      name: 'Напряжение датчика',
+      unit: 'V',
+      icon: 'bolt',
+      parse: asFloat,
+      average: (v) => v,
+      change: () => (Math.random() - 0.5) * 0.02,
+      status: () => 'normal'
+    });
+
+    addMetric({
+      key: 'raw_value',
+      name: 'ADC Raw',
+      unit: 'ед.',
+      icon: 'microchip',
+      parse: asInt,
+      average: (v) => v,
+      change: () => (Math.random() - 0.5) * 5,
+      status: () => 'normal'
+    });
+
+    addMetric({
+      key: 'uv_index',
+      name: 'UV-индекс',
+      unit: '',
+      icon: 'sun',
+      parse: asFloat,
+      valueOverride: uvValue,
+      average: (v) => v,
+      change: () => (Math.random() - 0.5) * 0.1,
+      status: (v) => (v > 8 ? 'danger' : v > 5 ? 'warning' : 'normal')
+    });
+
+    addMetric({
+      key: 'nox',
+      name: 'Оксиды азота (NOₓ)',
+      unit: 'ppb',
+      icon: 'industry',
+      parse: asInt,
+      average: (v) => v - 5 + Math.random() * 10,
+      change: () => (Math.random() - 0.5) * 5,
+      status: (v) => (v > 80 ? 'danger' : v > 60 ? 'warning' : 'normal')
+    });
+
+    addMetric({
+      key: 'benzene',
+      name: 'Бензол (C₆H₆)',
+      unit: 'ppb',
+      icon: 'vial',
+      parse: asFloat,
+      average: (v) => v - 0.2 + Math.random() * 0.4,
+      change: () => (Math.random() - 0.5) * 0.1,
+      status: (v) => (v > 3 ? 'danger' : v > 2 ? 'warning' : 'normal')
+    });
+
+    addMetric({
+      key: 'free_memory',
+      name: 'Свободная память',
+      unit: 'байт',
+      icon: 'memory',
+      parse: asInt,
+      average: (v) => v,
+      change: () => (Math.random() - 0.5) * 64,
+      status: () => 'normal'
+    });
 
     return {
       name: 'ESP8266 Sensor',
       address: 'Подключенный датчик',
-      status: data.status || 'Online',
+      status: (data.status || 'Online').toString().toLowerCase() === 'online' ? 'Online' : data.status,
       sensors: sensorData.length,
       icon: 'wifi',
       sensorData: sensorData
