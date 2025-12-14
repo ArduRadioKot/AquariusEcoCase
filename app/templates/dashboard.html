@@ -33,30 +33,20 @@
   </section>
 
   <section class="location-selector" data-aos="fade-up">
-    <h3 class="section-title">Подключенный датчик</h3>
+    <h3 class="section-title">Подключенные датчики</h3>
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="deviceSearch" placeholder="Поиск по device_ID..." autocomplete="off">
+        <button id="clearSearch" class="clear-search" style="display: none;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
     <div class="selector-container">
-      <div class="selector-title">ESP8266 Сенсор</div>
-      <div class="location-options">
-        <div class="location-option active" data-location="esp01">
-          <div class="location-header">
-            <div class="location-icon">
-              <i class="fas fa-wifi"></i>
-            </div>
-            <div class="location-info">
-              <div class="location-name">ESP8266 Датчик</div>
-              <div class="location-address">Подключенный сенсор</div>
-            </div>
-            <div class="location-status" id="sensorStatus">Online</div>
-          </div>
-          <div class="location-sensors">
-            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
-            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
-            <div class="sensor-tag"><i class="fas fa-smog"></i> CO₂</div>
-            <div class="sensor-tag"><i class="fas fa-wind"></i> PM2.5</div>
-            <div class="sensor-tag"><i class="fas fa-weight-hanging"></i> Давление</div>
-            <div class="sensor-tag"><i class="fas fa-flask"></i> ЛОС</div>
-          </div>
-        </div>
+      <div class="selector-title">ESP8266 Сенсоры</div>
+      <div class="location-options" id="locationOptions">
+        <!-- Устройства будут загружены динамически -->
       </div>
     </div>
   </section>

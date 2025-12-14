@@ -41,27 +41,145 @@ AOS.init({
     });
   }
 
-  // Обработчик выбора местоположения
-  document.querySelectorAll('.location-option').forEach(option => {
-    option.addEventListener('click', function() {
-      // Убираем активный класс у всех опций
-      document.querySelectorAll('.location-option').forEach(opt => {
-        opt.classList.remove('active');
-      });
-      
-      // Добавляем активный класс к выбранной опции
-      this.classList.add('active');
-      
-      // Показываем данные для выбранного местоположения
-      const locationId = this.getAttribute('data-location');
-      showLocationData(locationId);
-    });
+  // Обработчики выбора местоположения теперь в displayDevicesList()
+
+  // Хранилище всех устройств
+  let allDevices = {};
+  let currentSearchQuery = '';
+
+  // Инициализация с данными всех устройств
+  document.addEventListener('DOMContentLoaded', () => {
+    loadAllDevices();
+    setupSearchHandler();
+    
+    // Обновление списка устройств каждые 5 секунд
+    setInterval(loadAllDevices, 5000);
   });
 
-  // Инициализация с данными ESP8266 по умолчанию
-  document.addEventListener('DOMContentLoaded', () => {
-    showLocationData('esp01');
-  });
+  // Функция для получения всех устройств
+  async function loadAllDevices() {
+    try {
+      const response = await fetch('/api/sensor-data');
+      if (!response.ok) {
+        throw new Error('Failed to fetch devices');
+      }
+      const data = await response.json();
+      if (data.devices) {
+        allDevices = data.devices;
+        displayDevicesList();
+      }
+    } catch (error) {
+      console.error('Error fetching devices:', error);
+    }
+  }
+
+  // Функция для отображения списка устройств
+  function displayDevicesList() {
+    const locationOptions = document.getElementById('locationOptions');
+    if (!locationOptions) return;
+
+    const deviceIds = Object.keys(allDevices);
+    
+    // Фильтрация по поисковому запросу
+    const filteredDevices = deviceIds.filter(deviceId => {
+      if (!currentSearchQuery) return true;
+      return deviceId.toLowerCase().includes(currentSearchQuery.toLowerCase());
+    });
+
+    if (filteredDevices.length === 0) {
+      locationOptions.innerHTML = `
+        <div class="no-devices">
+          <i class="fas fa-search"></i>
+          <p>Устройства не найдены</p>
+        </div>
+      `;
+      return;
+    }
+
+    locationOptions.innerHTML = filteredDevices.map(deviceId => {
+      const deviceData = allDevices[deviceId];
+      const status = deviceData.data?.status || 'offline';
+      const isOnline = status.toLowerCase() === 'online';
+      const deviceName = deviceData.data?.device || deviceId;
+      
+      return `
+        <div class="location-option ${deviceId === getActiveDeviceId() ? 'active' : ''}" data-location="${deviceId}">
+          <div class="location-header">
+            <div class="location-icon">
+              <i class="fas fa-wifi"></i>
+            </div>
+            <div class="location-info">
+              <div class="location-name">${deviceName}</div>
+              <div class="location-address">Device ID: ${deviceId}</div>
+            </div>
+            <div class="location-status ${isOnline ? '' : 'status-offline'}">${isOnline ? 'Online' : 'Offline'}</div>
+          </div>
+          <div class="location-sensors">
+            <div class="sensor-tag"><i class="fas fa-thermometer-half"></i> Температура</div>
+            <div class="sensor-tag"><i class="fas fa-tint"></i> Влажность</div>
+            <div class="sensor-tag"><i class="fas fa-smog"></i> CO₂</div>
+            <div class="sensor-tag"><i class="fas fa-wind"></i> PM2.5</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Добавляем обработчики клика
+    locationOptions.querySelectorAll('.location-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.location-option').forEach(opt => {
+          opt.classList.remove('active');
+        });
+        this.classList.add('active');
+        const locationId = this.getAttribute('data-location');
+        showLocationData(locationId);
+      });
+    });
+
+    // Если нет активного устройства, выбираем первое
+    const activeOption = locationOptions.querySelector('.location-option.active');
+    if (!activeOption && filteredDevices.length > 0) {
+      const firstOption = locationOptions.querySelector('.location-option');
+      if (firstOption) {
+        firstOption.classList.add('active');
+        const firstDeviceId = firstOption.getAttribute('data-location');
+        showLocationData(firstDeviceId);
+      }
+    }
+  }
+
+  // Функция для получения активного device ID
+  function getActiveDeviceId() {
+    const activeOption = document.querySelector('.location-option.active');
+    return activeOption ? activeOption.getAttribute('data-location') : null;
+  }
+
+  // Настройка обработчика поиска
+  function setupSearchHandler() {
+    const searchInput = document.getElementById('deviceSearch');
+    const clearButton = document.getElementById('clearSearch');
+    
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+      currentSearchQuery = e.target.value.trim();
+      displayDevicesList();
+      
+      // Показываем/скрываем кнопку очистки
+      if (currentSearchQuery) {
+        clearButton.style.display = 'block';
+      } else {
+        clearButton.style.display = 'none';
+      }
+    });
+
+    clearButton.addEventListener('click', () => {
+      searchInput.value = '';
+      currentSearchQuery = '';
+      clearButton.style.display = 'none';
+      displayDevicesList();
+    });
+  }
 
   // Функция для получения данных с сервера
   async function fetchSensorData(device = 'esp01') {
