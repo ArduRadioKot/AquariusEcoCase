@@ -103,7 +103,27 @@ private:
     unsigned long lastUpdate;
   };
   
+  // Флаги установленных параметров
+  struct SensorFlags {
+    bool temperature;
+    bool humidity;
+    bool aqi;
+    bool tvoc;
+    bool eco2;
+    bool co;
+    bool alcohol;
+    bool co2;
+    bool toluene;
+    bool nh4;
+    bool acetone;
+    bool pm25;
+    bool pm10;
+    bool dust_density;
+    bool uv_index;
+  };
+  
   SensorData _currentData;
+  SensorFlags _sensorFlags;
   
   // Приватные методы
   void setupAP();

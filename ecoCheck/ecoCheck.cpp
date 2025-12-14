@@ -38,6 +38,7 @@ EcoCheck::EcoCheck(const char* serverIP, int serverPort, const char* deviceID)
   
   // Инициализация данных датчиков
   memset(&_currentData, 0, sizeof(_currentData));
+  memset(&_sensorFlags, 0, sizeof(_sensorFlags));
 }
 
 // Инициализация библиотеки
@@ -172,6 +173,7 @@ void EcoCheck::connectToWiFi() {
 // Установка температуры
 void EcoCheck::setTemperature(float value) {
   _currentData.temperature = value;
+  _sensorFlags.temperature = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -179,6 +181,7 @@ void EcoCheck::setTemperature(float value) {
 // Установка влажности
 void EcoCheck::setHumidity(float value) {
   _currentData.humidity = value;
+  _sensorFlags.humidity = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -186,6 +189,7 @@ void EcoCheck::setHumidity(float value) {
 // Установка AQI
 void EcoCheck::setAQI(int value) {
   _currentData.aqi = value;
+  _sensorFlags.aqi = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -193,6 +197,7 @@ void EcoCheck::setAQI(int value) {
 // Установка TVOC
 void EcoCheck::setTVOC(float value) {
   _currentData.tvoc = value;
+  _sensorFlags.tvoc = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -200,6 +205,7 @@ void EcoCheck::setTVOC(float value) {
 // Установка eCO2
 void EcoCheck::setECO2(float value) {
   _currentData.eco2 = value;
+  _sensorFlags.eco2 = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -207,6 +213,7 @@ void EcoCheck::setECO2(float value) {
 // Установка CO
 void EcoCheck::setCO(float value) {
   _currentData.co = value;
+  _sensorFlags.co = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -214,6 +221,7 @@ void EcoCheck::setCO(float value) {
 // Установка Alcohol
 void EcoCheck::setAlcohol(float value) {
   _currentData.alcohol = value;
+  _sensorFlags.alcohol = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -221,6 +229,7 @@ void EcoCheck::setAlcohol(float value) {
 // Установка CO2
 void EcoCheck::setCO2(float value) {
   _currentData.co2 = value;
+  _sensorFlags.co2 = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -228,6 +237,7 @@ void EcoCheck::setCO2(float value) {
 // Установка Toluene
 void EcoCheck::setToluene(float value) {
   _currentData.toluene = value;
+  _sensorFlags.toluene = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -235,6 +245,7 @@ void EcoCheck::setToluene(float value) {
 // Установка Ammonia
 void EcoCheck::setAmmonia(float value) {
   _currentData.nh4 = value;
+  _sensorFlags.nh4 = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -242,6 +253,7 @@ void EcoCheck::setAmmonia(float value) {
 // Установка Acetone
 void EcoCheck::setAcetone(float value) {
   _currentData.acetone = value;
+  _sensorFlags.acetone = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -249,6 +261,7 @@ void EcoCheck::setAcetone(float value) {
 // Установка PM2.5
 void EcoCheck::setPM25(float value) {
   _currentData.pm25 = value;
+  _sensorFlags.pm25 = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -256,6 +269,7 @@ void EcoCheck::setPM25(float value) {
 // Установка PM10
 void EcoCheck::setPM10(float value) {
   _currentData.pm10 = value;
+  _sensorFlags.pm10 = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -263,6 +277,7 @@ void EcoCheck::setPM10(float value) {
 // Установка Dust Density
 void EcoCheck::setDustDensity(float value) {
   _currentData.dust_density = value;
+  _sensorFlags.dust_density = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -270,6 +285,7 @@ void EcoCheck::setDustDensity(float value) {
 // Установка UV Index
 void EcoCheck::setUVIndex(float value) {
   _currentData.uv_index = value;
+  _sensorFlags.uv_index = true;
   _currentData.dataValid = true;
   _currentData.lastUpdate = millis();
 }
@@ -306,40 +322,51 @@ bool EcoCheck::sendDataToServer() {
   postData += "&status=" + String(hasRecentData ? "online" : "no_data");
   postData += "&free_memory=" + String(ESP.getFreeHeap());
   
-  if (hasRecentData) {
-    // Стандартные параметры
+  // Отправляем только те параметры, которые были установлены пользователем
+  if (_sensorFlags.temperature) {
     postData += "&temperature=" + String(_currentData.temperature, 1);
+  }
+  if (_sensorFlags.humidity) {
     postData += "&humidity=" + String(_currentData.humidity, 1);
+  }
+  if (_sensorFlags.aqi) {
     postData += "&aqi=" + String(_currentData.aqi);
+  }
+  if (_sensorFlags.tvoc) {
     postData += "&tvoc=" + String(_currentData.tvoc, 0);
+  }
+  if (_sensorFlags.eco2) {
     postData += "&eco2=" + String(_currentData.eco2, 0);
+  }
+  if (_sensorFlags.co) {
     postData += "&co=" + String(_currentData.co, 2);
+  }
+  if (_sensorFlags.alcohol) {
     postData += "&alcohol=" + String(_currentData.alcohol, 2);
+  }
+  if (_sensorFlags.co2) {
     postData += "&co2_real=" + String(_currentData.co2, 0);
+  }
+  if (_sensorFlags.toluene) {
     postData += "&toluene=" + String(_currentData.toluene, 2);
+  }
+  if (_sensorFlags.nh4) {
     postData += "&ammonia=" + String(_currentData.nh4, 2);
+  }
+  if (_sensorFlags.acetone) {
     postData += "&acetone=" + String(_currentData.acetone, 2);
+  }
+  if (_sensorFlags.pm25) {
     postData += "&pm25=" + String(_currentData.pm25, 1);
+  }
+  if (_sensorFlags.pm10) {
     postData += "&pm10=" + String(_currentData.pm10, 1);
+  }
+  if (_sensorFlags.dust_density) {
     postData += "&dust_density=" + String(_currentData.dust_density, 1);
+  }
+  if (_sensorFlags.uv_index) {
     postData += "&uv_index=" + String(_currentData.uv_index, 1);
-  } else {
-    // Если данных нет - отправляем 0 для всех параметров
-    postData += "&temperature=0";
-    postData += "&humidity=0";
-    postData += "&aqi=0";
-    postData += "&tvoc=0";
-    postData += "&eco2=0";
-    postData += "&co=0";
-    postData += "&alcohol=0";
-    postData += "&co2_real=0";
-    postData += "&toluene=0";
-    postData += "&ammonia=0";
-    postData += "&acetone=0";
-    postData += "&pm25=0";
-    postData += "&pm10=0";
-    postData += "&dust_density=0";
-    postData += "&uv_index=0";
   }
   
   // Отправка HTTP запроса

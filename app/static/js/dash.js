@@ -227,11 +227,24 @@ AOS.init({
       status = () => 'normal',
       valueOverride
     }) => {
+      // Пропускаем служебные поля
+      if (key === 'status' || key === 'free_memory' || key === 'device') return;
+      
+      const deviceStatus = data.status || 'online';
       const raw = valueOverride !== undefined ? valueOverride : data[key];
+      
+      // Пропускаем, если значение отсутствует или является пустой строкой
       if (raw === undefined || raw === null || raw === '') return;
+      
+      // Если ключ отсутствует в исходных данных (не был отправлен датчиком), пропускаем
+      // Это проверяется только если valueOverride не задан
+      if (valueOverride === undefined && !(key in data)) return;
+      
+      // Если статус "no_data" и значение 0 или "0", не показываем (это означает отсутствие данных)
+      if (deviceStatus.toLowerCase() === 'no_data' && (raw === '0' || raw === 0)) return;
 
       const numeric = parse(raw);
-      if (numeric === null) return;
+      if (numeric === null || isNaN(numeric)) return;
 
       sensorData.push({
         type: type || key,

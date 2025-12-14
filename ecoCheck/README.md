@@ -173,7 +173,22 @@ void setAPName(const char* apSSID, const char* apPassword = "12345678");
 
 ## Формат данных на сервере
 
-Библиотека отправляет POST запрос на `/data` с данными в формате `application/x-www-form-urlencoded`:
+Библиотека отправляет POST запрос на `/data` с данными в формате `application/x-www-form-urlencoded`.
+
+**Важно:** На сервер отправляются **только те параметры, которые вы явно установили** через функции `set*()`. Если вы не вызвали, например, `setTemperature()`, то параметр `temperature` не будет включен в запрос.
+
+Пример запроса (если установлены только температура, влажность и AQI):
+
+```
+device=esp01
+status=online
+free_memory=12345
+temperature=23.5
+humidity=55.0
+aqi=50
+```
+
+Если установлены все параметры:
 
 ```
 device=esp01
@@ -185,6 +200,8 @@ aqi=50
 tvoc=100
 eco2=400
 co=0.5
+pm25=15.2
+uv_index=3.5
 ...
 ```
 
