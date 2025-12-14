@@ -32,115 +32,248 @@ export const formatSensorData = (serverData) => {
   const data = serverData.data;
   const sensors = [];
 
-  if (data.temperature) {
-    sensors.push({
-      id: 'temperature',
-      name: 'Температура',
-      value: parseFloat(data.temperature),
-      unit: '°C',
-      icon: 'thermometer',
-      color: '#e74c3c',
-    });
-  }
+  const hasValue = (v) => v !== undefined && v !== null && v !== '';
+  const asFloat = (v) => {
+    const num = parseFloat(v);
+    return Number.isNaN(num) ? null : num;
+  };
+  const asInt = (v) => {
+    const num = parseInt(v, 10);
+    return Number.isNaN(num) ? null : num;
+  };
 
-  if (data.humidity) {
-    sensors.push({
-      id: 'humidity',
-      name: 'Влажность',
-      value: parseFloat(data.humidity),
-      unit: '%',
-      icon: 'water',
-      color: '#3498db',
-    });
-  }
+  const addSensor = ({
+    key,
+    altKey,
+    id,
+    name,
+    unit = '',
+    icon = 'gauge',
+    color = '#17827E',
+    parse = asFloat,
+  }) => {
+    const raw = hasValue(data[key]) ? data[key] : altKey ? data[altKey] : undefined;
+    if (!hasValue(raw)) return;
+    const val = parse(raw);
+    if (val === null) return;
 
-  if (data.co2) {
     sensors.push({
-      id: 'co2',
-      name: 'CO₂',
-      value: parseInt(data.co2),
-      unit: 'ppm',
-      icon: 'cloud',
-      color: '#9b59b6',
+      id: id || key,
+      name,
+      value: val,
+      unit,
+      icon,
+      color,
     });
-  }
+  };
 
-  if (data.pm25) {
-    sensors.push({
-      id: 'pm25',
-      name: 'PM2.5',
-      value: parseInt(data.pm25),
-      unit: 'µg/m³',
-      icon: 'wind',
-      color: '#f39c12',
-    });
-  }
+  const co2Value = hasValue(data.co2) ? data.co2 : data.co2_real;
+  const uvValue = hasValue(data.uv_index) ? data.uv_index : data.uv;
+  const ammoniaValue = hasValue(data.ammonia) ? data.ammonia : data.nh4;
+  const pm25Value = hasValue(data.pm25) ? data.pm25 : data.dust;
 
-  if (data.pressure) {
-    sensors.push({
-      id: 'pressure',
-      name: 'Давление',
-      value: parseFloat(data.pressure),
-      unit: 'hPa',
-      icon: 'gauge',
-      color: '#16a085',
-    });
-  }
+  addSensor({
+    key: 'temperature',
+    name: 'Температура',
+    unit: '°C',
+    icon: 'thermometer',
+    color: '#e74c3c',
+  });
 
-  if (data.voc) {
-    sensors.push({
-      id: 'voc',
-      name: 'ЛОС',
-      value: parseInt(data.voc),
-      unit: 'ppb',
-      icon: 'flask',
-      color: '#e67e22',
-    });
-  }
+  addSensor({
+    key: 'humidity',
+    name: 'Влажность',
+    unit: '%',
+    icon: 'water',
+    color: '#3498db',
+  });
 
-  if (data.ammonia) {
-    sensors.push({
-      id: 'ammonia',
-      name: 'Амиак (NH₃)',
-      value: parseFloat(data.ammonia),
-      unit: 'ppm',
-      icon: 'atom',
-      color: '#27ae60',
-    });
-  }
+  addSensor({
+    key: 'aqi',
+    name: 'AQI',
+    unit: 'индекс',
+    icon: 'leaf',
+    color: '#2ecc71',
+    parse: asInt,
+  });
 
-  if (data.nox) {
-    sensors.push({
-      id: 'nox',
-      name: 'Оксиды азота (NOₓ)',
-      value: parseInt(data.nox),
-      unit: 'ppb',
-      icon: 'factory',
-      color: '#c0392b',
-    });
-  }
+  addSensor({
+    key: 'tvoc',
+    id: 'tvoc',
+    name: 'TVOC',
+    unit: 'ppb',
+    icon: 'flask',
+    color: '#e67e22',
+    parse: asInt,
+  });
 
-  if (data.benzene) {
-    sensors.push({
-      id: 'benzene',
-      name: 'Бензол (C₆H₆)',
-      value: parseFloat(data.benzene),
-      unit: 'ppb',
-      icon: 'vial',
-      color: '#8e44ad',
-    });
-  }
+  addSensor({
+    key: 'voc',
+    name: 'ЛОС',
+    unit: 'ppb',
+    icon: 'flask',
+    color: '#e67e22',
+    parse: asInt,
+  });
 
-  if (data.uv_index) {
-    sensors.push({
-      id: 'uv_index',
-      name: 'УФ-индекс',
-      value: parseInt(data.uv_index),
-      unit: '',
-      icon: 'sun',
-      color: '#f1c40f',
-    });
-  }
+  addSensor({
+    key: 'eco2',
+    id: 'eco2',
+    name: 'eCO₂',
+    unit: 'ppm',
+    icon: 'cloud',
+    color: '#9b59b6',
+    parse: asInt,
+  });
+
+  addSensor({
+    key: 'co2',
+    altKey: 'co2_real',
+    id: 'co2',
+    name: 'CO₂',
+    unit: 'ppm',
+    icon: 'cloud',
+    color: '#9b59b6',
+    parse: asInt,
+  });
+
+  addSensor({
+    key: 'pm25',
+    altKey: 'dust',
+    id: 'pm25',
+    name: 'PM2.5',
+    unit: 'µg/m³',
+    icon: 'wind',
+    color: '#f39c12',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'pm10',
+    name: 'PM10',
+    unit: 'µg/m³',
+    icon: 'cloud',
+    color: '#d35400',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'pressure',
+    name: 'Давление',
+    unit: 'hPa',
+    icon: 'gauge',
+    color: '#16a085',
+  });
+
+  addSensor({
+    key: 'ammonia',
+    altKey: 'nh4',
+    name: 'Амиак (NH₃)',
+    unit: 'ppm',
+    icon: 'atom',
+    color: '#27ae60',
+  });
+
+  addSensor({
+    key: 'co',
+    name: 'CO',
+    unit: 'ppm',
+    icon: 'factory',
+    color: '#e74c3c',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'alcohol',
+    name: 'Алкоголь',
+    unit: 'ppm',
+    icon: 'bottle-soda',
+    color: '#8e44ad',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'toluene',
+    name: 'Толуол',
+    unit: 'ppm',
+    icon: 'flask',
+    color: '#c0392b',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'acetone',
+    name: 'Ацетон',
+    unit: 'ppm',
+    icon: 'vial',
+    color: '#8e44ad',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'dust_density',
+    name: 'Плотность пыли',
+    unit: 'µg/m³',
+    icon: 'chart-bar',
+    color: '#7f8c8d',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'calc_voltage',
+    name: 'Напряжение датчика',
+    unit: 'V',
+    icon: 'flash',
+    color: '#2980b9',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'raw_value',
+    name: 'ADC Raw',
+    unit: '',
+    icon: 'chip',
+    color: '#2c3e50',
+    parse: asInt,
+  });
+
+  addSensor({
+    key: 'uv_index',
+    altKey: 'uv',
+    id: 'uv_index',
+    name: 'УФ-индекс',
+    unit: '',
+    icon: 'sun',
+    color: '#f1c40f',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'nox',
+    name: 'Оксиды азота (NOₓ)',
+    unit: 'ppb',
+    icon: 'factory',
+    color: '#c0392b',
+    parse: asInt,
+  });
+
+  addSensor({
+    key: 'benzene',
+    name: 'Бензол (C₆H₆)',
+    unit: 'ppb',
+    icon: 'vial',
+    color: '#8e44ad',
+    parse: asFloat,
+  });
+
+  addSensor({
+    key: 'free_memory',
+    name: 'Свободная память',
+    unit: 'байт',
+    icon: 'memory',
+    color: '#27ae60',
+    parse: asInt,
+  });
 
   return sensors;
 };

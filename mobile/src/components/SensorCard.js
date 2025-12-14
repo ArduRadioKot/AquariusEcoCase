@@ -15,6 +15,12 @@ const SensorCard = ({ sensor, onPress }) => {
       factory: 'factory',
       vial: 'test-tube',
       sun: 'weather-sunny',
+      leaf: 'leaf',
+      'bottle-soda': 'bottle-soda',
+      'chart-bar': 'chart-bar',
+      flash: 'flash',
+      chip: 'cpu-64-bit',
+      memory: 'memory',
     };
     return iconMap[iconType] || 'chart-line';
   };

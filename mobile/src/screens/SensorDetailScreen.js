@@ -28,24 +28,37 @@ const SensorDetailScreen = ({ route }) => {
     try {
       const data = await getSensorData('esp01');
       if (data && data.data) {
+        const hasValue = (v) => v !== undefined && v !== null && v !== '';
+
         // Маппинг ID сенсора на ключ в данных сервера
         const dataKeyMap = {
-          temperature: 'temperature',
-          humidity: 'humidity',
-          co2: 'co2',
-          pm25: 'pm25',
-          pressure: 'pressure',
-          voc: 'voc',
-          ammonia: 'ammonia',
-          nox: 'nox',
-          benzene: 'benzene',
-          uv_index: 'uv_index',
+          temperature: ['temperature'],
+          humidity: ['humidity'],
+          co2: ['co2', 'co2_real'],
+          eco2: ['eco2'],
+          pm25: ['pm25', 'dust'],
+          pm10: ['pm10'],
+          pressure: ['pressure'],
+          voc: ['voc'],
+          tvoc: ['tvoc'],
+          aqi: ['aqi'],
+          ammonia: ['ammonia', 'nh4'],
+          co: ['co'],
+          alcohol: ['alcohol'],
+          toluene: ['toluene'],
+          acetone: ['acetone'],
+          dust_density: ['dust_density'],
+          calc_voltage: ['calc_voltage'],
+          raw_value: ['raw_value'],
+          uv_index: ['uv_index', 'uv'],
+          nox: ['nox'],
+          benzene: ['benzene'],
+          free_memory: ['free_memory'],
         };
         
-        const dataKey = dataKeyMap[sensor.id] || sensor.id;
-        const value = data.data[dataKey] 
-          ? parseFloat(data.data[dataKey]) 
-          : sensor.value;
+        const keys = dataKeyMap[sensor.id] || [sensor.id];
+        const rawValue = keys.map((k) => data.data[k]).find((v) => hasValue(v));
+        const value = hasValue(rawValue) ? parseFloat(rawValue) : sensor.value;
         
         setCurrentValue(value);
         // Генерируем историю для графика
@@ -80,6 +93,12 @@ const SensorDetailScreen = ({ route }) => {
       factory: 'factory',
       vial: 'test-tube',
       sun: 'weather-sunny',
+      leaf: 'leaf',
+      'bottle-soda': 'bottle-soda',
+      'chart-bar': 'chart-bar',
+      flash: 'flash',
+      chip: 'cpu-64-bit',
+      memory: 'memory',
     };
     return iconMap[iconType] || 'chart-line';
   };

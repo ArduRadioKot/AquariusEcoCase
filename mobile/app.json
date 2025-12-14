@@ -24,6 +24,11 @@
         "backgroundColor": "#30AC97"
       },
       "package": "com.aquariuseccase.app"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4c84a24e-6b6a-4303-93ff-9bb2ec0e699c"
+      }
     }
   }
 }
