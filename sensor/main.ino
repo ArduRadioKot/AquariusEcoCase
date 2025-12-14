@@ -1,7 +1,28 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+#include <EEPROM.h>
+
+// Конфигурация
+const char* AP_SSID = "ESP8266_Config";
+const char* AP_PASSWORD = "12345678";
+
+// Сервер для конфигурации
+ESP8266WebServer server(80);
+
+// Для хранения данных в EEPROM
+struct WiFiConfig {
+  char ssid[32];
+  char password[64];
+  bool configured;
+};
+
+WiFiConfig wifiConfig;
+
+// Флаги состояний
 bool isConfigured = false;
 bool shouldReboot = false;
 unsigned long lastDataSend = 0;
-const unsigned long DATA_INTERVAL = 5000; // 5 секунд
+const unsigned long DATA_INTERVAL = 10000; // 5 секунд
 
 // Настройки сервера
 const char* serverIP = "82.202.142.35"; 
@@ -307,25 +328,25 @@ void processSerialData(String data) {
 }
 
 void sendDataToServer() {
-  // Проверяем, есть ли актуальные данные
-  bool hasRecentData = (millis() - currentData.lastUpdate < 10000); // Данные актуальны если получены менее 10 секунд назад
+  // Проверяем, есть ли актуальные данные (получены менее 15 секунд назад)
+  bool hasRecentData = (millis() - currentData.lastUpdate < 15000);
   
   if (WiFi.status() == WL_CONNECTED) {
     WiFiClient client;
     
-    Serial.print("Connecting to server for data: ");
+    Serial.print("Connecting to server: ");
     Serial.print(serverIP);
     Serial.print(":");
     Serial.println(serverPort);
     
     if (client.connect(serverIP, serverPort)) {
-      // Формирование POST данных
+      // Формирование POST данных - ВСЕГДА отправляем все параметры
       String postData = "device=esp01";
       postData += "&status=" + String(hasRecentData ? "online" : "no_data");
       postData += "&free_memory=" + String(ESP.getFreeHeap());
       
-      if (hasRecentData && currentData.dataValid) {
-        // AHT21 данные
+      if (hasRecentData) {
+        // Всегда отправляем температуру и влажность
         postData += "&temperature=" + String(currentData.temperature, 1);
         postData += "&humidity=" + String(currentData.humidity, 1);
         
@@ -334,7 +355,7 @@ void sendDataToServer() {
         postData += "&tvoc=" + String(currentData.tvoc, 0);
         postData += "&eco2=" + String(currentData.eco2, 0);
         
-        // MQ-135 данные
+        // ВСЕ данные MQ-135 (из примера видно, что они приходят)
         postData += "&co=" + String(currentData.co, 2);
         postData += "&alcohol=" + String(currentData.alcohol, 2);
         postData += "&co2_real=" + String(currentData.co2, 0);
@@ -354,13 +375,21 @@ void sendDataToServer() {
         postData += "&calc_voltage=" + String(currentData.calcVoltage, 2);
         postData += "&raw_value=" + String(currentData.voMeasured, 0);
         
-        Serial.println("\nОтправляем актуальные данные на сервер:");
+        Serial.println("=== Отправляем ВСЕ данные на сервер ===");
         Serial.print("Temperature: "); Serial.println(currentData.temperature);
         Serial.print("Humidity: "); Serial.println(currentData.humidity);
+        Serial.print("CO: "); Serial.println(currentData.co);
+        Serial.print("Alcohol: "); Serial.println(currentData.alcohol);
+        Serial.print("CO2: "); Serial.println(currentData.co2);
+        Serial.print("Toluene: "); Serial.println(currentData.toluene);
         Serial.print("NH4: "); Serial.println(currentData.nh4);
+        Serial.print("Acetone: "); Serial.println(currentData.acetone);
         Serial.print("Dust: "); Serial.println(currentData.dust);
+        Serial.print("UV: "); Serial.println(currentData.uv);
+        Serial.println("======================================");
+        
       } else {
-        // Если данных нет - отправляем 0
+        // Если данных нет - отправляем 0 для всех параметров
         postData += "&temperature=0";
         postData += "&humidity=0";
         postData += "&aqi=0";
@@ -377,7 +406,7 @@ void sendDataToServer() {
         postData += "&dust_density=0";
         postData += "&uv_index=0";
         
-        Serial.println("Нет актуальных данных от датчиков - отправляем 0");
+        Serial.println("Данные устарели - отправляем 0 для всех параметров");
       }
       
       client.println("POST /data HTTP/1.1");
@@ -397,17 +426,13 @@ void sendDataToServer() {
       }
       
       client.stop();
+      Serial.println("Данные отправлены на сервер");
       
-      if (hasRecentData && currentData.dataValid) {
-        Serial.println("Sensor data sent to server successfully");
-      } else {
-        Serial.println("Zero data sent to server (no sensor data available)");
-      }
     } else {
-      Serial.println("Failed to connect to server for data");
+      Serial.println("Ошибка подключения к серверу");
     }
   } else {
-    Serial.println("WiFi not connected - cannot send data");
+    Serial.println("WiFi не подключен");
   }
 }
 
